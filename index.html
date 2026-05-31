@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Latency</title>
+<style>
+  :root {
+    --lens-r: clamp(64px, 9vmin, 130px);   /* radius of the reveal circle */
+    --bg: #ffffff;
+    /* Crop window of the source (1536x2752). 2147 ≈ knees-up.
+       Lower the height number to crop tighter (closer); raise it toward 2752 for full body. */
+    --crop-w: 1536;
+    --crop-h: 2147;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { overflow-x: hidden; }
+  body.menu-open { overflow: hidden; }
+  [id] { scroll-margin-top: 24px; }
+
+  .hero {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 64px);            /* fill the viewport below the nav strip */
+    height: calc(100dvh - 64px);
+    background: var(--bg);
+    overflow: hidden;
+    cursor: none;                 /* the lens ring IS the cursor */
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .hero.touch { cursor: pointer; }
+
+  /* ---- Centered stage with a fixed crop ratio (knees-up) ---- */
+  .stage {
+    position: absolute;
+    top: 0; bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 100%;
+    aspect-ratio: var(--crop-w) / var(--crop-h);
+  }
+  /* On screens narrower than the crop, fit by width instead so the figure
+     never gets its sides clipped. */
+  @media (max-aspect-ratio: 1536/2147) {
+    .stage { height: auto; width: 100%; top: 50%; bottom: auto; transform: translate(-50%, -50%); }
+  }
+
+  .figure { position: absolute; inset: 0; }
+
+  .figure img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;            /* fill the crop window */
+    object-position: center top;  /* anchor the head; crop the legs */
+    visibility: hidden;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* Base layer: the current character, shown whole. */
+  .figure img.base { visibility: visible; z-index: 1; }
+
+  /* Trail canvas: paints the revealed character clipped to the lens, with a
+     per-frame fade so it leaves a lingering smear as it moves. */
+  .trail {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* ---- The lens ring that tracks the cursor ---- */
+  .ring {
+    position: absolute;
+    top: 0; left: 0;
+    width: calc(var(--lens-r) * 2);
+    height: calc(var(--lens-r) * 2);
+    margin: calc(var(--lens-r) * -1) 0 0 calc(var(--lens-r) * -1);
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    mix-blend-mode: difference;          /* stays legible over any tone */
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0;
+    transform: translate3d(-9999px, -9999px, 0);
+    transition: opacity 0.22s ease;
+  }
+  .ring.show { opacity: 1; }
+
+  /* Precise centre crosshair — the aim point. */
+  .ring::before, .ring::after {
+    content: "";
+    position: absolute;
+    top: 50%; left: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    transform: translate(-50%, -50%);
+  }
+  .ring::before { width: 1px; height: 9px; }   /* vertical tick */
+  .ring::after  { width: 9px; height: 1px; }   /* horizontal tick */
+
+  /* Trailing character name beside the lens. */
+  .name {
+    position: absolute;
+    top: 0; left: 0;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: #fff;
+    mix-blend-mode: difference;
+    white-space: nowrap;
+    pointer-events: none;
+    z-index: 3;
+    opacity: 0;
+    transform: translate3d(-9999px, -9999px, 0);
+    transition: opacity 0.22s ease;
+  }
+  .name.show { opacity: 0.9; }
+
+  /* ---- Hint ---- */
+  .hint {
+    position: absolute;
+    left: 50%;
+    bottom: 6%;
+    transform: translateX(-50%);
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: rgba(20, 20, 20, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    pointer-events: none;
+    z-index: 4;
+    transition: opacity 0.5s ease;
+  }
+  .hint.gone { opacity: 0; }
+
+  /* ---- Visible / keyboard control ---- */
+  .next-btn {
+    position: absolute;
+    right: max(20px, env(safe-area-inset-right));
+    bottom: max(20px, env(safe-area-inset-bottom));
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0,0,0,0.25);
+    background: rgba(255,255,255,0.55);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #111; font-size: 20px; line-height: 1;
+    cursor: pointer;
+    display: grid; place-items: center;
+    z-index: 5;
+    opacity: 0.45;
+    transition: opacity 0.25s ease, transform 0.15s ease;
+  }
+  .next-btn:hover { opacity: 1; }
+  .next-btn:active { transform: scale(0.92); }
+  .next-btn:focus-visible { opacity: 1; outline: 2px solid #111; outline-offset: 3px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ring, .name { transition: none; }
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  /* ===================== SITE CHROME (around the hero) ===================== */
+  :root { --ink: #111; --muted: #777; --line: rgba(0,0,0,0.12); }
+
+  /* shared label/wordmark type — matches the hero character-name styling */
+  .label {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--ink);
+  }
+
+  /* ---- Nav (its own strip above the hero, not overlaid) ---- */
+  .nav {
+    position: relative; width: 100%;
+    display: flex; align-items: center; justify-content: center;
+    height: 64px; padding: 0 20px; z-index: 50;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);   /* thin divider between nav and hero */
+  }
+  .nav .wordmark { font-size: 15px; letter-spacing: 0.34em; }
+  .burger {
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    width: 42px; height: 42px; border: 0; background: none; cursor: pointer;
+    display: grid; place-items: center; color: var(--ink);
+  }
+  .burger span {
+    display: block; width: 22px; height: 1.5px; background: var(--ink);
+    margin: 3px 0; transition: opacity .2s ease, transform .2s ease;
+  }
+
+  /* ---- Full-screen menu ---- */
+  .menu {
+    position: fixed; inset: 0; z-index: 60; background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 26px;
+    opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility .2s ease;
+  }
+  .menu.open { opacity: 1; visibility: visible; }
+  .menu a {
+    font-size: clamp(30px, 8vw, 58px); font-weight: 800; letter-spacing: -0.01em;
+    color: var(--ink); text-decoration: none;
+  }
+  .menu .close {
+    position: absolute; top: 18px; right: 18px; width: 42px; height: 42px;
+    border: 0; background: none; font-size: 28px; line-height: 1; color: var(--ink); cursor: pointer;
+  }
+
+  /* ---- Layout primitives ---- */
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  section.block { padding: 140px 0; }
+  .eyebrow { display: block; text-align: center; margin-bottom: 52px; color: var(--muted); }
+
+  /* Statement */
+  .statement { padding: 210px 0; }
+  .statement p {
+    max-width: 16ch; margin: 0 auto; text-align: center; font-weight: 800;
+    line-height: 1.04; letter-spacing: -0.02em; font-size: clamp(2.2rem, 7vw, 5.5rem);
+  }
+
+  /* Roster grid */
+  .roster-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+  .card-fig { display: flex; flex-direction: column; align-items: center; }
+  .card-fig .ph { width: 100%; aspect-ratio: 3/4; overflow: hidden; background: #f3f3f3; }
+  .card-fig .ph img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+  .card-fig .meta { margin-top: 14px; display: flex; align-items: center; gap: 10px; }
+  .card-fig .nm { font-weight: 600; }
+  .tier {
+    font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+    border: 1px solid var(--line); border-radius: 999px; padding: 3px 8px; color: var(--muted);
+  }
+
+  /* Work grid */
+  .work-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  .work-item .ph { width: 100%; aspect-ratio: 4/3; background: #eaeaea; }
+  .work-item .meta { margin-top: 12px; }
+  .work-item .brand { font-weight: 600; }
+  .work-item .who { color: var(--muted); font-size: 14px; }
+
+  /* How it works */
+  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
+  .step .n { font-size: 13px; letter-spacing: 0.2em; color: var(--muted); }
+  .step h3 { margin: 14px 0 10px; font-size: 20px; font-weight: 600; }
+  .step p { margin: 0; color: var(--muted); line-height: 1.55; }
+
+  /* Pricing */
+  .price-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; max-width: 760px; margin: 0 auto; }
+  .price-card { border: 1px solid var(--line); border-radius: 14px; padding: 36px 30px; display: flex; flex-direction: column; }
+  .price-card h3 { margin: 0 0 22px; font-size: 22px; font-weight: 700; }
+  .price-card ul { list-style: none; padding: 0; margin: 0 0 28px; }
+  .price-card li { padding: 9px 0; border-bottom: 1px solid var(--line); color: var(--muted); }
+  .btn {
+    display: inline-block; text-align: center; padding: 13px 22px; border-radius: 999px;
+    background: var(--ink); color: #fff; text-decoration: none; border: 0; font: inherit; cursor: pointer;
+  }
+  .btn.block { width: 100%; }
+
+  /* Form */
+  .form { max-width: 560px; margin: 0 auto; display: grid; gap: 18px; }
+  .form label { display: grid; gap: 8px; font-size: 14px; color: var(--muted); }
+  .form input, .form textarea {
+    font: inherit; color: var(--ink); padding: 13px 14px;
+    border: 1px solid var(--line); border-radius: 10px; background: #fff;
+  }
+  .form textarea { min-height: 130px; resize: vertical; }
+
+  /* Footer */
+  .footer { padding: 96px 0 72px; text-align: center; }
+  .footer .wordmark { font-size: 14px; letter-spacing: 0.34em; }
+  .footer .links { margin-top: 22px; display: flex; gap: 26px; justify-content: center; flex-wrap: wrap; }
+  .footer .links a { color: var(--ink); text-decoration: none; }
+
+  /* ---- Mobile ---- */
+  @media (max-width: 760px) {
+    .hero { height: 78vh; height: 78svh; }   /* defined height — next section peeks */
+    section.block { padding: 92px 0; }
+    .statement { padding: 124px 0; }
+    .roster-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    .work-grid { grid-template-columns: 1fr; }
+    .steps { grid-template-columns: 1fr; gap: 30px; }
+    .price-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+  <!-- ===== Nav ===== -->
+  <header class="nav">
+    <span class="wordmark label">LATENCY</span>
+    <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- ===== Full-screen menu ===== -->
+  <nav class="menu" id="menu" aria-hidden="true">
+    <button class="close" id="menuClose" type="button" aria-label="Close menu">&times;</button>
+    <a href="#roster">Roster</a>
+    <a href="#work">Work</a>
+    <a href="#how">About</a>
+    <a href="#book">Book</a>
+  </nav>
+
+  <!-- ===== Hero (interaction unchanged) ===== -->
+  <section
+    class="hero"
+    id="hero"
+    role="button"
+    tabindex="0"
+    aria-label="Character showcase. Move the cursor to reveal the next face through the lens; click to lock it in. Arrow keys also work."
+  >
+    <div class="stage" id="stage">
+      <div class="figure" id="figure"></div>
+      <canvas class="trail" id="trail" aria-hidden="true"></canvas>
+      <div class="ring" id="ring" aria-hidden="true"></div>
+      <div class="name" id="name" aria-hidden="true"></div>
+    </div>
+
+    <div class="hint" id="hint" aria-hidden="true">Move to reveal · click to lock</div>
+
+    <button class="next-btn" id="nextBtn" type="button" aria-label="Lock in next character">›</button>
+    <p class="sr-only" id="live" aria-live="polite"></p>
+  </section>
+
+  <!-- ===== Statement ===== -->
+  <section class="statement" id="statement">
+    <div class="wrap">
+      <p>Faces that move the feed. Built to carry a brand.</p>
+    </div>
+  </section>
+
+  <!-- ===== Roster ===== -->
+  <section class="block" id="roster">
+    <div class="wrap">
+      <span class="eyebrow label">Roster</span>
+      <div class="roster-grid">
+        <div class="card-fig">
+          <div class="ph"><img src="processed/Sofia.png" alt="Sofia" /></div>
+          <div class="meta"><span class="nm">Sofia</span><span class="tier">Signature</span></div>
+        </div>
+        <div class="card-fig">
+          <div class="ph"><img src="processed/Felix.png" alt="Felix" /></div>
+          <div class="meta"><span class="nm">Felix</span><span class="tier">Stock</span></div>
+        </div>
+        <div class="card-fig">
+          <div class="ph"><img src="processed/Yuna.png" alt="Yuna" /></div>
+          <div class="meta"><span class="nm">Yuna</span><span class="tier">Signature</span></div>
+        </div>
+        <div class="card-fig">
+          <div class="ph"><img src="processed/Valentina.png" alt="Valentina" /></div>
+          <div class="meta"><span class="nm">Valentina</span><span class="tier">Stock</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Work ===== -->
+  <section class="block" id="work">
+    <div class="wrap">
+      <span class="eyebrow label">Selected work</span>
+      <div class="work-grid">
+        <div class="work-item">
+          <div class="ph"></div>
+          <div class="meta"><div class="brand">Aether Studios</div><div class="who">with Sofia</div></div>
+        </div>
+        <div class="work-item">
+          <div class="ph"></div>
+          <div class="meta"><div class="brand">Nocturne</div><div class="who">with Felix</div></div>
+        </div>
+        <div class="work-item">
+          <div class="ph"></div>
+          <div class="meta"><div class="brand">Halo Labs</div><div class="who">with Yuna</div></div>
+        </div>
+        <div class="work-item">
+          <div class="ph"></div>
+          <div class="meta"><div class="brand">Vantage</div><div class="who">with Valentina</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== How it works ===== -->
+  <section class="block" id="how">
+    <div class="wrap">
+      <span class="eyebrow label">How it works</span>
+      <div class="steps">
+        <div class="step">
+          <div class="n">01</div>
+          <h3>Pick a face</h3>
+          <p>Choose a character from the roster. Lorem ipsum dolor sit amet, consectetur adipiscing.</p>
+        </div>
+        <div class="step">
+          <div class="n">02</div>
+          <h3>Brief the look</h3>
+          <p>Tell us the campaign and tone. Lorem ipsum dolor sit amet, consectetur adipiscing.</p>
+        </div>
+        <div class="step">
+          <div class="n">03</div>
+          <h3>Get the drop</h3>
+          <p>Receive finished assets on schedule. Lorem ipsum dolor sit amet, consectetur adipiscing.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Pricing ===== -->
+  <section class="block" id="pricing">
+    <div class="wrap">
+      <span class="eyebrow label">Pricing</span>
+      <div class="price-grid">
+        <div class="price-card">
+          <h3>Stock</h3>
+          <ul>
+            <li>Lorem ipsum dolor sit amet</li>
+            <li>Consectetur adipiscing elit</li>
+            <li>Sed do eiusmod tempor</li>
+          </ul>
+          <a class="btn block" href="#book">Get in touch</a>
+        </div>
+        <div class="price-card">
+          <h3>Signature</h3>
+          <ul>
+            <li>Lorem ipsum dolor sit amet</li>
+            <li>Consectetur adipiscing elit</li>
+            <li>Sed do eiusmod tempor</li>
+          </ul>
+          <a class="btn block" href="#book">Get in touch</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Book / Enquiry ===== -->
+  <section class="block" id="book">
+    <div class="wrap">
+      <span class="eyebrow label">Book</span>
+      <form class="form" onsubmit="return false;">
+        <label>Name
+          <input type="text" name="name" placeholder="Your name" />
+        </label>
+        <label>Brand
+          <input type="text" name="brand" placeholder="Company or brand" />
+        </label>
+        <label>What are you looking for
+          <textarea name="brief" placeholder="Tell us about the project"></textarea>
+        </label>
+        <button class="btn" type="submit">Submit</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="wordmark label">LATENCY</div>
+    <div class="links label">
+      <a href="#roster">Roster</a>
+      <a href="#work">Work</a>
+      <a href="#how">About</a>
+      <a href="#book">Book</a>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const ROSTER = [
+        { name: "Sofia",     src: "processed/Sofia.png" },
+        { name: "Felix",     src: "processed/Felix.png" },
+        { name: "Yuna",      src: "processed/Yuna.png" },
+        { name: "Valentina", src: "processed/Valentina.png" },
+      ];
+
+      const hero   = document.getElementById("hero");
+      const stage  = document.getElementById("stage");
+      const figure = document.getElementById("figure");
+      const ring   = document.getElementById("ring");
+      const nameEl = document.getElementById("name");
+      const hint   = document.getElementById("hint");
+      const nextBtn= document.getElementById("nextBtn");
+      const live   = document.getElementById("live");
+
+      const isTouch = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+      if (isTouch) {
+        hero.classList.add("touch");
+        hint.textContent = "Drag to reveal · tap to lock";
+      }
+
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const EASE = reduceMotion ? 1 : 0.07;     // lens-head lag — LOWER = reveal trails further behind cursor
+      // Velocity-aware fade: while the cursor moves the head lags and the worm
+      // strings out (slow fade); when it settles the head catches up and the
+      // trail collapses back into the lens (fast fade).
+      const FADE_STREAK   = reduceMotion ? 1 : 0.03;  // fade while moving — LOWER = longer worm
+      const FADE_COLLAPSE = reduceMotion ? 1 : 0.22;  // fade when settled — HIGHER = snappier catch-up
+      const FADE_OUT_FRAMES = 120;              // frames to keep fading after pointer leaves
+
+      let baseIndex = 0;                         // character shown whole
+      let lensIndex = 1 % ROSTER.length;         // character revealed in the circle
+      let hasInteracted = false;
+
+      // ---- Build + preload stacked images ----
+      const imgs = ROSTER.map((c) => {
+        const img = document.createElement("img");
+        img.src = c.src;
+        img.alt = c.name;
+        img.decoding = "async";
+        figure.appendChild(img);
+        const pre = new Image(); pre.src = c.src;   // force decode up front
+        return img;
+      });
+
+      function paint() {
+        imgs.forEach((img, i) => img.classList.toggle("base", i === baseIndex));
+        nameEl.textContent = ROSTER[lensIndex].name;
+        live.textContent = ROSTER[lensIndex].name;
+      }
+
+      // ---- Trail canvas ----
+      const trail = document.getElementById("trail");
+      const ctx = trail.getContext("2d");
+      const IW = 1536, IH = 2752;               // source image size
+      let drawW = 0, drawH = 0, offX = 0, offY = 0, stageW = 0, stageH = 0;
+
+      function resizeCanvas() {
+        stageW = stage.clientWidth;
+        stageH = stage.clientHeight;
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        trail.width  = Math.round(stageW * dpr);
+        trail.height = Math.round(stageH * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);  // draw in CSS pixels
+        // replicate object-fit: cover + object-position: center top
+        const scale = Math.max(stageW / IW, stageH / IH);
+        drawW = IW * scale; drawH = IH * scale;
+        offX = (stageW - drawW) / 2; offY = 0;
+      }
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
+      let lensShown = false;
+      let tgtX = 0, tgtY = 0, curX = 0, curY = 0, lastX = 0, lastY = 0;
+      let fadeBudget = 0, raf = null;
+
+      function showLens(on) {
+        lensShown = on;
+        ring.classList.toggle("show", on);
+        nameEl.classList.toggle("show", on);
+        if (on) { lastX = curX; lastY = curY; startLoop(); }
+      }
+
+      function setTarget(clientX, clientY) {
+        const r = stage.getBoundingClientRect();
+        tgtX = clientX - r.left;
+        tgtY = clientY - r.top;
+      }
+
+      function render() {
+        const rad = ring.offsetWidth / 2 || 100;
+
+        // 1) fade the existing trail. The fade strength tracks the lag gap:
+        //    big gap (cursor moving, head behind) -> slow fade, worm strings out.
+        //    gap -> 0 (cursor settled, head caught up) -> fast fade, trail collapses.
+        const gap = Math.hypot(tgtX - curX, tgtY - curY);
+        const t = Math.min(gap / rad, 1);                       // 0 settled … 1 moving
+        const fade = FADE_COLLAPSE + (FADE_STREAK - FADE_COLLAPSE) * t;
+        ctx.globalCompositeOperation = "destination-out";
+        ctx.fillStyle = `rgba(0,0,0,${fade})`;
+        ctx.fillRect(0, 0, stageW, stageH);
+        ctx.globalCompositeOperation = "source-over";
+
+        // 2) stamp the revealed character along the lens path (interpolated)
+        const img = imgs[lensIndex];
+        if (lensShown && img.complete && img.naturalWidth) {
+          const dx = curX - lastX, dy = curY - lastY;
+          const steps = Math.max(1, Math.ceil(Math.hypot(dx, dy) / (rad * 0.4)));
+          for (let s = 1; s <= steps; s++) {
+            const x = lastX + dx * (s / steps);
+            const y = lastY + dy * (s / steps);
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(x, y, rad, 0, Math.PI * 2);
+            ctx.clip();
+            ctx.drawImage(img, offX, offY, drawW, drawH);
+            ctx.restore();
+          }
+          lastX = curX; lastY = curY;
+        }
+
+        // 3) position the ring + trailing name
+        ring.style.transform = `translate3d(${curX}px, ${curY}px, 0)`;
+        let nx = curX + rad + 16, flip = "";
+        if (nx + 130 > stageW) { nx = curX - rad - 16; flip = " translateX(-100%)"; }
+        nameEl.style.transform =
+          `translate3d(${nx}px, ${curY}px, 0) translateY(-50%)${flip}`;
+      }
+
+      function loop() {
+        curX += (tgtX - curX) * EASE;
+        curY += (tgtY - curY) * EASE;
+        render();
+        fadeBudget = lensShown ? FADE_OUT_FRAMES : fadeBudget - 1;
+        if (!lensShown && fadeBudget <= 0) {
+          ctx.clearRect(0, 0, stageW, stageH);   // trail fully gone — rest
+          raf = null;
+        } else {
+          raf = requestAnimationFrame(loop);
+        }
+      }
+      function startLoop() { if (!raf) raf = requestAnimationFrame(loop); }
+
+      // Lock the revealed character in and queue the following one.
+      function commit() {
+        baseIndex = lensIndex;
+        lensIndex = (lensIndex + 1) % ROSTER.length;
+        paint();
+        render();
+        dismissHint();
+      }
+
+      function dismissHint() {
+        if (hasInteracted) return;
+        hasInteracted = true;
+        hint.classList.add("gone");
+      }
+
+      // ---- Desktop pointer ----
+      if (!isTouch) {
+        stage.addEventListener("pointerenter", (e) => {
+          setTarget(e.clientX, e.clientY);
+          curX = tgtX; curY = tgtY;     // appear in place, no trail-in from afar
+          showLens(true);
+          render();
+        });
+        stage.addEventListener("pointerleave", () => showLens(false));
+        stage.addEventListener("pointermove",  (e) => setTarget(e.clientX, e.clientY));
+        hero.addEventListener("click", (e) => {
+          if (e.target === nextBtn) return;
+          commit();
+        });
+      } else {
+        // ---- Touch: drag to move the lens, tap to lock in ----
+        let startX = 0, startY = 0, moved = false;
+        hero.addEventListener("touchstart", (e) => {
+          const t = e.touches[0];
+          startX = t.clientX; startY = t.clientY; moved = false;
+          setTarget(t.clientX, t.clientY);
+          curX = tgtX; curY = tgtY;
+          showLens(true); render();
+        }, { passive: true });
+        hero.addEventListener("touchmove", (e) => {
+          const t = e.touches[0];
+          if (Math.hypot(t.clientX - startX, t.clientY - startY) > 8) moved = true;
+          setTarget(t.clientX, t.clientY);
+        }, { passive: true });
+        hero.addEventListener("touchend", (e) => {
+          if (e.target !== nextBtn && !moved) commit();   // a tap locks in
+          showLens(false);
+        });
+      }
+
+      // ---- Visible control + keyboard ----
+      nextBtn.addEventListener("click", (e) => { e.stopPropagation(); commit(); });
+      hero.addEventListener("keydown", (e) => {
+        if (["ArrowRight","ArrowDown","Enter"," "].includes(e.key)) { e.preventDefault(); commit(); }
+        else if (["ArrowLeft","ArrowUp"].includes(e.key)) {
+          e.preventDefault();
+          lensIndex = (baseIndex - 1 + ROSTER.length) % ROSTER.length;
+          baseIndex = (lensIndex - 1 + ROSTER.length) % ROSTER.length;
+          paint();
+        }
+      });
+
+      paint();
+      live.textContent = ROSTER[0].name;
+    })();
+  </script>
+
+  <script>
+    // ---- Burger menu (open/close, no heavy animation) ----
+    (function () {
+      const burger = document.getElementById("burger");
+      const menu   = document.getElementById("menu");
+      const close  = document.getElementById("menuClose");
+
+      function setOpen(on) {
+        menu.classList.toggle("open", on);
+        document.body.classList.toggle("menu-open", on);
+        menu.setAttribute("aria-hidden", on ? "false" : "true");
+        burger.setAttribute("aria-expanded", on ? "true" : "false");
+      }
+
+      burger.addEventListener("click", () => setOpen(!menu.classList.contains("open")));
+      close.addEventListener("click", () => setOpen(false));
+      menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => setOpen(false)));
+      document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
+    })();
+  </script>
+</body>
+</html>

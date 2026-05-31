@@ -1,0 +1,16 @@
+# Python virtual env
+.venv/
+__pycache__/
+*.pyc
+
+# Local TLS certs / private keys — never commit
+.tls/
+
+# rembg cutout cache
+processed/_cut/
+
+# OS cruft
+.DS_Store
+
+# Local Claude permission config (machine-specific)
+.claude/settings.local.json
