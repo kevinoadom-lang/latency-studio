@@ -669,28 +669,66 @@
 
   <!-- ===== How it works ===== -->
   <section class="block" id="how">
-    <div class="wrap">
-      <span class="eyebrow label">How it works</span>
-      <div class="steps">
-        <div class="step">
-          <div class="n">01</div>
-          <h3>Pick a face</h3>
-          <p>Choose a character from the roster. Lorem ipsum dolor sit amet, consectetur adipiscing.</p>
+  <div class="wrap">
+    <span class="eyebrow label">How it works</span>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;margin-top:64px;">
+
+      <!-- Left: transformation visual -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="aspect-ratio:3/4;overflow:hidden;border-radius:8px;background:#f3f3f3;">
+            <img src="yuna-our-legacy-hoodie.webp" alt="Product input" style="width:100%;height:100%;object-fit:cover;object-position:center;" />
+          </div>
+          <span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);">You send this</span>
         </div>
-        <div class="step">
-          <div class="n">02</div>
-          <h3>Brief the look</h3>
-          <p>Tell us the campaign and tone. Lorem ipsum dolor sit amet, consectetur adipiscing.</p>
-        </div>
-        <div class="step">
-          <div class="n">03</div>
-          <h3>Get the drop</h3>
-          <p>Receive finished assets on schedule. Lorem ipsum dolor sit amet, consectetur adipiscing.</p>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="aspect-ratio:3/4;overflow:hidden;border-radius:8px;background:#f3f3f3;">
+            <img src="processed/Yuna.png" alt="Finished e-comm shot" style="width:100%;height:100%;object-fit:cover;object-position:center top;" />
+          </div>
+          <span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);">We deliver this</span>
         </div>
       </div>
-    </div>
-  </section>
 
+      <!-- Right: steps -->
+      <div style="display:flex;flex-direction:column;gap:48px;">
+        <div style="display:flex;gap:24px;align-items:flex-start;">
+          <span style="font-size:64px;font-weight:800;line-height:1;color:rgba(0,0,0,0.06);flex-shrink:0;margin-top:-8px;">01</span>
+          <div>
+            <h3 style="margin:0 0 8px;font-size:18px;font-weight:600;">Pick a face</h3>
+            <p style="margin:0;color:var(--muted);line-height:1.6;">Choose from the roster — Stock for a one-off drop, Signature if you want that face to become part of your brand.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:24px;align-items:flex-start;">
+          <span style="font-size:64px;font-weight:800;line-height:1;color:rgba(0,0,0,0.06);flex-shrink:0;margin-top:-8px;">02</span>
+          <div>
+            <h3 style="margin:0 0 8px;font-size:18px;font-weight:600;">Send your product</h3>
+            <p style="margin:0;color:var(--muted);line-height:1.6;">Ship us your product or send flat-lays. We handle the creative direction, styling, and shoot.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:24px;align-items:flex-start;">
+          <span style="font-size:64px;font-weight:800;line-height:1;color:rgba(0,0,0,0.06);flex-shrink:0;margin-top:-8px;">03</span>
+          <div>
+            <h3 style="margin:0 0 8px;font-size:18px;font-weight:600;">Receive the drop</h3>
+            <p style="margin:0;color:var(--muted);line-height:1.6;">Hand-reviewed, e-comm ready imagery delivered in 48–72 hours. No studio, no scheduling, no reshoots.</p>
+          </div>
+        </div>
+        <a href="#book" class="btn" style="align-self:flex-start;">Start your first drop →</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Mobile styles -->
+  <style>
+    @media (max-width: 760px) {
+      #how .wrap > div[style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+        gap: 48px !important;
+      }
+    }
+  </style>
+</section>
   <!-- ===== Pricing ===== -->
   <section class="block" id="pricing">
   <div class="wrap">
