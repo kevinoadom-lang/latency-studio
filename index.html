@@ -91,8 +91,6 @@
     width: calc(var(--lens-r) * 2);
     height: calc(var(--lens-r) * 2);
     margin: calc(var(--lens-r) * -1) 0 0 calc(var(--lens-r) * -1);
-    border-radius: 50%;
-    border: 1px solid rgba(255, 255, 255, 0.9);
     mix-blend-mode: difference;          /* stays legible over any tone */
     pointer-events: none;
     z-index: 3;
@@ -102,16 +100,9 @@
   }
   .ring.show { opacity: 1; }
 
-  /* Precise centre crosshair — the aim point. */
-  .ring::before, .ring::after {
-    content: "";
-    position: absolute;
-    top: 50%; left: 50%;
-    background: rgba(255, 255, 255, 0.9);
-    transform: translate(-50%, -50%);
-  }
-  .ring::before { width: 1px; height: 9px; }   /* vertical tick */
-  .ring::after  { width: 9px; height: 1px; }   /* horizontal tick */
+  /* Grid reticle (SVG) fills the lens — one colour, hairline lines, blended
+     for legibility. Reads as a camera/measurement instrument. */
+  .reticle { width: 100%; height: 100%; display: block; overflow: visible; }
 
   /* Trailing character name beside the lens. */
   .name {
@@ -246,21 +237,104 @@
   /* Roster grid */
   .roster-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
   .card-fig { display: flex; flex-direction: column; align-items: center; }
-  .card-fig .ph { width: 100%; aspect-ratio: 3/4; overflow: hidden; background: #f3f3f3; }
+  .card-fig .ph { position: relative; width: 100%; aspect-ratio: 3/4; overflow: hidden; background: #f3f3f3; }
   .card-fig .ph img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
   .card-fig .meta { margin-top: 14px; display: flex; align-items: center; gap: 10px; }
   .card-fig .nm { font-weight: 600; }
-  .tier {
-    font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
-    border: 1px solid var(--line); border-radius: 999px; padding: 3px 8px; color: var(--muted);
+
+  /* Tier badges */
+  .tier { font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; border-radius: 999px; padding: 3px 8px; }
+  .tier--sig {                                   /* Signature — frosted glass pill */
+    background: rgba(0, 0, 0, 0.08);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    border: 0.5px solid rgba(0, 0, 0, 0.12);
+    color: var(--ink); font-weight: 500;
+  }
+  .tier--stock {                                 /* Stock — ghost pill */
+    background: none;
+    border: 0.5px solid var(--line);
+    color: var(--muted); font-weight: 400;
   }
 
-  /* Work grid */
-  .work-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-  .work-item .ph { width: 100%; aspect-ratio: 4/3; background: #eaeaea; }
-  .work-item .meta { margin-top: 12px; }
-  .work-item .brand { font-weight: 600; }
-  .work-item .who { color: var(--muted); font-size: 14px; }
+  /* Roster hover overlay — frosted model card */
+  .card-overlay {
+    position: absolute; inset: 0;
+    background: rgba(255, 255, 255, 0.75);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 22px; gap: 14px;
+    opacity: 0; transition: opacity 0.28s ease;
+  }
+  .card-fig:hover .card-overlay,
+  .card-fig:focus-within .card-overlay { opacity: 1; }
+  .ov-name { font-weight: 600; font-size: 15px; letter-spacing: 0.04em; color: var(--ink); }
+  .ov-spec { margin: 0; display: grid; gap: 7px; }
+  .ov-spec > div {
+    display: flex; justify-content: space-between; gap: 12px;
+    font-size: 9.5px; letter-spacing: 0.13em; text-transform: uppercase;
+  }
+  .ov-spec dt { margin: 0; color: var(--muted); }
+  .ov-spec dd { margin: 0; color: var(--ink); text-align: right; }
+
+  /* Roster copy block */
+  .roster-copy { max-width: 680px; margin: 96px auto 0; display: grid; gap: 26px; }
+  .roster-copy p { margin: 0; line-height: 1.6; color: var(--ink); }
+  .tier-name { text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.78em; font-weight: 500; }
+
+  /* Work — Apple TV-style full-bleed cards */
+  .work-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; }
+  .work-item {
+    position: relative; display: block; width: 100%; aspect-ratio: 3/4;
+    overflow: hidden; border-radius: 16px; border: 0; padding: 0; margin: 0;
+    cursor: pointer; background: #eaeaea; font: inherit; color: inherit;
+  }
+  .work-item img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+  .work-item .work-hover {
+    position: absolute; inset: 0; background: rgba(0, 0, 0, 0);
+    transition: background 0.25s ease; pointer-events: none;
+  }
+  .work-item:hover .work-hover, .work-item:focus-visible .work-hover { background: rgba(0, 0, 0, 0.20); }
+  .work-item .work-grad {
+    position: absolute; left: 0; right: 0; bottom: 0; height: 48%;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0));
+    pointer-events: none;
+  }
+  .work-item .work-meta { position: absolute; left: 22px; bottom: 20px; color: #fff; pointer-events: none; }
+  .work-item .work-brand { font-weight: 600; font-size: 18px; letter-spacing: 0.01em; }
+  .work-item .work-who { font-size: 13px; opacity: 0.85; margin-top: 3px; }
+  .work-item .work-cta {                          /* frosted glass pill */
+    position: absolute; right: 18px; bottom: 18px;
+    font-size: 11px; letter-spacing: 0.06em; padding: 8px 15px;
+    border-radius: 999px; color: #fff;
+    background: rgba(255, 255, 255, 0.18);
+    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    border: 0.5px solid rgba(255, 255, 255, 0.35);
+  }
+  .work-item:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+  /* Lightbox */
+  .lightbox {
+    position: fixed; inset: 0; z-index: 100; background: #000;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden; transition: opacity 0.2s ease, visibility 0.2s ease;
+  }
+  .lightbox.open { opacity: 1; visibility: visible; }
+  .lb-img { max-width: 88vw; max-height: 84vh; object-fit: contain; user-select: none; -webkit-user-drag: none; }
+  .lb-close, .lb-nav {
+    position: absolute; background: none; border: 0; color: #fff; cursor: pointer;
+    opacity: 0.7; transition: opacity 0.2s ease; line-height: 1; display: grid; place-items: center;
+  }
+  .lb-close:hover, .lb-nav:hover, .lb-close:focus-visible, .lb-nav:focus-visible { opacity: 1; }
+  .lb-close { top: 16px; right: 20px; font-size: 30px; width: 46px; height: 46px; }
+  .lb-nav { top: 50%; transform: translateY(-50%); font-size: 46px; width: 58px; height: 88px; }
+  .lb-prev { left: 12px; }
+  .lb-next { right: 12px; }
+  .lb-caption {
+    position: absolute; bottom: 24px; left: 0; right: 0; text-align: center;
+    color: rgba(255, 255, 255, 0.8); font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase;
+    pointer-events: none;
+  }
+  body.lb-open { overflow: hidden; }
 
   /* How it works */
   .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; }
@@ -336,7 +410,39 @@
     <div class="stage" id="stage">
       <div class="figure" id="figure"></div>
       <canvas class="trail" id="trail" aria-hidden="true"></canvas>
-      <div class="ring" id="ring" aria-hidden="true"></div>
+      <div class="ring" id="ring" aria-hidden="true">
+        <svg class="reticle" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" focusable="false">
+          <defs>
+            <clipPath id="lensClip"><circle cx="50" cy="50" r="50" /></clipPath>
+          </defs>
+          <!-- Measurement grid, clipped to the circle. Hairline (<=0.4px). -->
+          <g clip-path="url(#lensClip)" fill="none" stroke="#fff"
+             stroke-width="0.4" vector-effect="non-scaling-stroke">
+            <!-- secondary grid — two extra H + two extra V, evenly spaced, 0.2 -->
+            <g stroke-opacity="0.2">
+              <line x1="0" y1="25" x2="100" y2="25" />
+              <line x1="0" y1="75" x2="100" y2="75" />
+              <line x1="25" y1="0" x2="25" y2="100" />
+              <line x1="75" y1="0" x2="75" y2="100" />
+            </g>
+            <!-- primary cross — full diameter through centre, 0.4 -->
+            <g stroke-opacity="0.4">
+              <line x1="0" y1="50" x2="100" y2="50" />
+              <line x1="50" y1="0" x2="50" y2="100" />
+            </g>
+          </g>
+          <!-- Clean circle edge -->
+          <circle cx="50" cy="50" r="49.6" fill="none" stroke="#fff"
+                  stroke-opacity="0.8" stroke-width="0.8" vector-effect="non-scaling-stroke" />
+          <!-- Centre crosshair — short, slightly heavier (1.1px) -->
+          <g stroke="#fff" stroke-opacity="0.9" stroke-width="1.1" vector-effect="non-scaling-stroke">
+            <line x1="46" y1="50" x2="54" y2="50" />
+            <line x1="50" y1="46" x2="50" y2="54" />
+          </g>
+          <!-- Centre dot -->
+          <circle cx="50" cy="50" r="1.2" fill="#fff" fill-opacity="0.9" />
+        </svg>
+      </div>
       <div class="name" id="name" aria-hidden="true"></div>
     </div>
 
@@ -349,7 +455,7 @@
   <!-- ===== Statement ===== -->
   <section class="statement" id="statement">
     <div class="wrap">
-      <p>Faces that move the feed. Built to carry a brand.</p>
+      <p>Your e-comm imagery. Shot, styled, delivered in 48 hours powered by AI.</p>
     </div>
   </section>
 
@@ -358,22 +464,84 @@
     <div class="wrap">
       <span class="eyebrow label">Roster</span>
       <div class="roster-grid">
-        <div class="card-fig">
-          <div class="ph"><img src="processed/Sofia.png" alt="Sofia" /></div>
-          <div class="meta"><span class="nm">Sofia</span><span class="tier">Signature</span></div>
+        <div class="card-fig" tabindex="0">
+          <div class="ph">
+            <img src="processed/Sofia.png" alt="Sofia" />
+            <div class="card-overlay">
+              <div class="ov-name">Sofia</div>
+              <dl class="ov-spec">
+                <div><dt>Height</dt><dd>5'9"</dd></div>
+                <div><dt>Ethnicity</dt><dd>Mixed / Afro-Caribbean</dd></div>
+                <div><dt>Hair</dt><dd>Dark brown natural curl</dd></div>
+                <div><dt>Eyes</dt><dd>Brown</dd></div>
+                <div><dt>Build</dt><dd>Athletic lean</dd></div>
+                <div><dt>Tier</dt><dd>Signature</dd></div>
+                <div><dt>Status</dt><dd>Available</dd></div>
+              </dl>
+            </div>
+          </div>
+          <div class="meta"><span class="nm">Sofia</span><span class="tier tier--sig">Signature</span></div>
         </div>
-        <div class="card-fig">
-          <div class="ph"><img src="processed/Felix.png" alt="Felix" /></div>
-          <div class="meta"><span class="nm">Felix</span><span class="tier">Stock</span></div>
+        <div class="card-fig" tabindex="0">
+          <div class="ph">
+            <img src="processed/Felix.png" alt="Felix" />
+            <div class="card-overlay">
+              <div class="ov-name">Felix</div>
+              <dl class="ov-spec">
+                <div><dt>Height</dt><dd>6'1"</dd></div>
+                <div><dt>Ethnicity</dt><dd>White / Northern European</dd></div>
+                <div><dt>Hair</dt><dd>Bleached blonde close crop</dd></div>
+                <div><dt>Eyes</dt><dd>Blue-grey</dd></div>
+                <div><dt>Build</dt><dd>Lean broad shoulder</dd></div>
+                <div><dt>Tier</dt><dd>Stock</dd></div>
+                <div><dt>Status</dt><dd>Available</dd></div>
+              </dl>
+            </div>
+          </div>
+          <div class="meta"><span class="nm">Felix</span><span class="tier tier--stock">Stock</span></div>
         </div>
-        <div class="card-fig">
-          <div class="ph"><img src="processed/Yuna.png" alt="Yuna" /></div>
-          <div class="meta"><span class="nm">Yuna</span><span class="tier">Signature</span></div>
+        <div class="card-fig" tabindex="0">
+          <div class="ph">
+            <img src="processed/Yuna.png" alt="Yuna" />
+            <div class="card-overlay">
+              <div class="ov-name">Yuna</div>
+              <dl class="ov-spec">
+                <div><dt>Height</dt><dd>5'6"</dd></div>
+                <div><dt>Ethnicity</dt><dd>East Asian</dd></div>
+                <div><dt>Hair</dt><dd>Black blunt bob</dd></div>
+                <div><dt>Eyes</dt><dd>Dark brown</dd></div>
+                <div><dt>Build</dt><dd>Slim narrow frame</dd></div>
+                <div><dt>Tier</dt><dd>Signature</dd></div>
+                <div><dt>Status</dt><dd>Available</dd></div>
+              </dl>
+            </div>
+          </div>
+          <div class="meta"><span class="nm">Yuna</span><span class="tier tier--sig">Signature</span></div>
         </div>
-        <div class="card-fig">
-          <div class="ph"><img src="processed/Valentina.png" alt="Valentina" /></div>
-          <div class="meta"><span class="nm">Valentina</span><span class="tier">Stock</span></div>
+        <div class="card-fig" tabindex="0">
+          <div class="ph">
+            <img src="processed/Valentina.png" alt="Valentina" />
+            <div class="card-overlay">
+              <div class="ov-name">Valentina</div>
+              <dl class="ov-spec">
+                <div><dt>Height</dt><dd>5'8"</dd></div>
+                <div><dt>Ethnicity</dt><dd>South Asian</dd></div>
+                <div><dt>Hair</dt><dd>Dark brown short textured</dd></div>
+                <div><dt>Eyes</dt><dd>Dark brown</dd></div>
+                <div><dt>Build</dt><dd>Slim angular</dd></div>
+                <div><dt>Tier</dt><dd>Stock</dd></div>
+                <div><dt>Status</dt><dd>Available</dd></div>
+              </dl>
+            </div>
+          </div>
+          <div class="meta"><span class="nm">Valentina</span><span class="tier tier--stock">Stock</span></div>
         </div>
+      </div>
+
+      <div class="roster-copy">
+        <p>A cast of AI models built for e-commerce. Each face is distinct, consistent, and available to put on your product.</p>
+        <p><span class="tier-name">Signature</span> — Exclusive. One brand per category, one region at a time. Book a Signature face and that character becomes part of your brand — same face, every drop, building recognition across every touchpoint.</p>
+        <p><span class="tier-name">Stock</span> — Shared. Available for one-off drops, first bookings, or brands that need great imagery fast. Same quality, no exclusivity.</p>
       </div>
     </div>
   </section>
@@ -383,22 +551,34 @@
     <div class="wrap">
       <span class="eyebrow label">Selected work</span>
       <div class="work-grid">
-        <div class="work-item">
-          <div class="ph"></div>
-          <div class="meta"><div class="brand">Aether Studios</div><div class="who">with Sofia</div></div>
-        </div>
-        <div class="work-item">
-          <div class="ph"></div>
-          <div class="meta"><div class="brand">Nocturne</div><div class="who">with Felix</div></div>
-        </div>
-        <div class="work-item">
-          <div class="ph"></div>
-          <div class="meta"><div class="brand">Halo Labs</div><div class="who">with Yuna</div></div>
-        </div>
-        <div class="work-item">
-          <div class="ph"></div>
-          <div class="meta"><div class="brand">Vantage</div><div class="who">with Valentina</div></div>
-        </div>
+        <button class="work-item" type="button" data-project="0">
+          <img src="Selected%20Works%20-%20Sofia%20Timeless%20Cab.png" alt="Aether Studios — with Sofia" style="object-position: center 40%;" />
+          <span class="work-hover"></span>
+          <span class="work-grad"></span>
+          <span class="work-meta"><span class="work-brand">Aether Studios</span><span class="work-who">with Sofia</span></span>
+          <span class="work-cta">View collection</span>
+        </button>
+        <button class="work-item" type="button" data-project="1">
+          <img src="Selected%20Works%20-%20Felix%20Street%20Crossing.png" alt="Nocturne — with Felix" style="object-position: center 10%;" />
+          <span class="work-hover"></span>
+          <span class="work-grad"></span>
+          <span class="work-meta"><span class="work-brand">Nocturne</span><span class="work-who">with Felix</span></span>
+          <span class="work-cta">View collection</span>
+        </button>
+        <button class="work-item" type="button" data-project="2">
+          <img src="Selected%20Works%20-%20Eleanor%20Doorbell.png" alt="Halo Labs — with Yuna" />
+          <span class="work-hover"></span>
+          <span class="work-grad"></span>
+          <span class="work-meta"><span class="work-brand">Halo Labs</span><span class="work-who">with Yuna</span></span>
+          <span class="work-cta">View collection</span>
+        </button>
+        <button class="work-item" type="button" data-project="3">
+          <img src="Selected%20Works%20-%20Valentina%20Interior.png" alt="Vantage — with Valentina" />
+          <span class="work-hover"></span>
+          <span class="work-grad"></span>
+          <span class="work-meta"><span class="work-brand">Vantage</span><span class="work-who">with Valentina</span></span>
+          <span class="work-cta">View collection</span>
+        </button>
       </div>
     </div>
   </section>
@@ -483,6 +663,91 @@
       <a href="#book">Book</a>
     </div>
   </footer>
+
+  <!-- ===== Lightbox ===== -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Project gallery" aria-hidden="true">
+    <button class="lb-close" id="lbClose" type="button" aria-label="Close">&times;</button>
+    <button class="lb-nav lb-prev" id="lbPrev" type="button" aria-label="Previous image">&#8249;</button>
+    <img class="lb-img" id="lbImg" alt="" />
+    <button class="lb-nav lb-next" id="lbNext" type="button" aria-label="Next image">&#8250;</button>
+    <div class="lb-caption" id="lbCaption"></div>
+  </div>
+
+  <script>
+    /* ===== Lightbox ===== */
+    (function () {
+      const PROJECTS = [
+        { brand: "Aether Studios", who: "with Sofia",     images: ["Selected Works - Sofia Timeless Cab.png"] },
+        { brand: "Nocturne",       who: "with Felix",     images: ["Selected Works - Felix Street Crossing.png"] },
+        { brand: "Halo Labs",      who: "with Yuna",      images: ["Selected Works - Eleanor Doorbell.png"] },
+        { brand: "Vantage",        who: "with Valentina", images: ["Selected Works - Valentina Interior.png"] },
+      ];
+
+      const lb       = document.getElementById("lightbox");
+      const lbImg    = document.getElementById("lbImg");
+      const lbCap    = document.getElementById("lbCaption");
+      const lbClose  = document.getElementById("lbClose");
+      const lbPrev   = document.getElementById("lbPrev");
+      const lbNext   = document.getElementById("lbNext");
+
+      let proj = null;
+      let idx  = 0;
+
+      function render() {
+        if (!proj) return;
+        const total = proj.images.length;
+        lbImg.src = encodeURI(proj.images[idx]);
+        lbImg.alt = proj.brand + " " + proj.who;
+        lbCap.textContent = proj.brand + "  ·  " + proj.who + (total > 1 ? "   " + (idx + 1) + " / " + total : "");
+        const multi = total > 1;
+        lbPrev.style.display = multi ? "" : "none";
+        lbNext.style.display = multi ? "" : "none";
+      }
+
+      function open(i) {
+        proj = PROJECTS[i];
+        if (!proj) return;
+        idx = 0;
+        render();
+        lb.classList.add("open");
+        lb.setAttribute("aria-hidden", "false");
+        document.body.classList.add("lb-open");
+        lbClose.focus();
+      }
+
+      function close() {
+        lb.classList.remove("open");
+        lb.setAttribute("aria-hidden", "true");
+        document.body.classList.remove("lb-open");
+        proj = null;
+      }
+
+      function step(d) {
+        if (!proj) return;
+        const total = proj.images.length;
+        idx = (idx + d + total) % total;
+        render();
+      }
+
+      document.querySelectorAll(".work-item").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          open(parseInt(btn.getAttribute("data-project"), 10));
+        });
+      });
+
+      lbClose.addEventListener("click", close);
+      lbPrev.addEventListener("click", function (e) { e.stopPropagation(); step(-1); });
+      lbNext.addEventListener("click", function (e) { e.stopPropagation(); step(1); });
+      lb.addEventListener("click", function (e) { if (e.target === lb) close(); });
+
+      document.addEventListener("keydown", function (e) {
+        if (!lb.classList.contains("open")) return;
+        if (e.key === "Escape") close();
+        else if (e.key === "ArrowLeft") step(-1);
+        else if (e.key === "ArrowRight") step(1);
+      });
+    })();
+  </script>
 
   <script>
     (function () {
