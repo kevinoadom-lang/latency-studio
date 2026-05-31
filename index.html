@@ -31,8 +31,8 @@
   .hero {
     position: relative;
     width: 100%;
-    height: calc(100vh - 64px);            /* fill the viewport below the nav strip */
-    height: calc(100dvh - 64px);
+    height: calc(100vh - 64px - var(--annc-h));   /* fill viewport below announcement + nav */
+    height: calc(100dvh - 64px - var(--annc-h));
     background: var(--bg);
     overflow: hidden;
     cursor: none;                 /* the lens ring IS the cursor */
@@ -178,12 +178,63 @@
   }
 
   /* ===================== SITE CHROME (around the hero) ===================== */
-  :root { --ink: #111; --muted: #777; --line: rgba(0,0,0,0.12); }
+  :root { --ink: #111; --muted: #777; --line: rgba(0,0,0,0.12); --annc-h: 44px; }
+  body.annc-off { --annc-h: 0px; }
 
   /* shared label/wordmark type — matches the hero character-name styling */
   .label {
     font-size: 11px; font-weight: 500; letter-spacing: 0.22em;
     text-transform: uppercase; color: var(--ink);
+  }
+
+  /* ---- Shared CTA pill (black, white text) ---- */
+  .cta-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--ink); color: #fff; text-decoration: none;
+    font-size: 12px; letter-spacing: 0.08em; font-weight: 500;
+    padding: 8px 16px; border-radius: 999px; white-space: nowrap;
+    transition: opacity .2s ease;
+  }
+  .cta-pill:hover { opacity: 0.82; }
+
+  /* ---- Top announcement bar (above the nav) ---- */
+  .announce {
+    display: flex; align-items: center; gap: 16px;
+    width: 100%; height: var(--annc-h); padding: 0 16px;
+    background: var(--bg); border-bottom: 1px solid var(--line);
+    font-size: 12px; letter-spacing: 0.08em; color: var(--muted);
+    overflow: hidden;
+  }
+  .announce__text { flex: 1 1 auto; min-width: 0; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; }
+  .announce__cta { flex: 0 0 auto; }
+  .announce__close {
+    flex: 0 0 auto; width: 30px; height: 30px; margin-right: -6px;
+    border: 0; background: none; cursor: pointer; color: var(--muted);
+    font-size: 18px; line-height: 1; display: grid; place-items: center;
+    transition: color .2s ease;
+  }
+  .announce__close:hover { color: var(--ink); }
+  body.annc-off .announce { display: none; }
+
+  /* ---- Sticky bottom CTA bar ---- */
+  .sticky-cta {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 60;
+    display: flex; align-items: center; justify-content: center; gap: 18px;
+    height: 52px; padding: 0 18px;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-sizing: content-box;
+    background: rgba(255,255,255,0.85);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border-top: 1px solid var(--line);
+    font-size: 12px; letter-spacing: 0.08em; color: var(--muted);
+    transform: translateY(110%); transition: transform 0.3s ease;
+    pointer-events: none;
+  }
+  .sticky-cta.show { transform: translateY(0); pointer-events: auto; }
+  .sticky-cta__text { white-space: nowrap; }
+  @media (prefers-reduced-motion: reduce) {
+    .sticky-cta { transition: none; }
   }
 
   /* ---- Nav (its own strip above the hero, not overlaid) ---- */
@@ -275,6 +326,9 @@
   }
   .ov-spec dt { margin: 0; color: var(--muted); }
   .ov-spec dd { margin: 0; color: var(--ink); text-align: right; }
+
+  /* View full roster CTA */
+  .roster-cta { text-align: center; margin-top: 48px; }
 
   /* Roster copy block */
   .roster-copy { max-width: 680px; margin: 96px auto 0; display: grid; gap: 26px; }
@@ -375,13 +429,39 @@
     section.block { padding: 92px 0; }
     .statement { padding: 124px 0; }
     .roster-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
-    .work-grid { grid-template-columns: 1fr; }
+
+    /* Selected Works — horizontal snap carousel (peeking next card) */
+    .work-grid {
+      display: flex;
+      grid-template-columns: none;
+      gap: 16px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-padding-left: 24px;
+      margin: 0 -24px;            /* bleed to the viewport edges */
+      padding: 0 24px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;      /* Firefox */
+    }
+    .work-grid::-webkit-scrollbar { display: none; }   /* WebKit */
+    .work-item {
+      flex: 0 0 83%;             /* ~83% wide → next card peeks at the right edge */
+      scroll-snap-align: start;
+    }
+
     .steps { grid-template-columns: 1fr; gap: 30px; }
     .price-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
+  <!-- ===== Announcement bar ===== -->
+  <div class="announce" id="announce" role="region" aria-label="Announcement">
+    <span class="announce__text">AI e-comm imagery for DTC brands — no studio, no day rate.</span>
+    <a class="cta-pill announce__cta" href="#book">Book your first drop →</a>
+    <button class="announce__close" id="anncClose" type="button" aria-label="Dismiss announcement">&times;</button>
+  </div>
+
   <!-- ===== Nav ===== -->
   <header class="nav">
     <span class="wordmark label">LATENCY</span>
@@ -538,6 +618,10 @@
         </div>
       </div>
 
+      <div class="roster-cta">
+        <a class="cta-pill" href="roster.html">View Full Roster →</a>
+      </div>
+
       <div class="roster-copy">
         <p>A cast of AI models built for e-commerce. Each face is distinct, consistent, and available to put on your product.</p>
         <p><span class="tier-name">Signature</span> — Exclusive. One brand per category, one region at a time. Book a Signature face and that character becomes part of your brand — same face, every drop, building recognition across every touchpoint.</p>
@@ -664,6 +748,12 @@
     </div>
   </footer>
 
+  <!-- ===== Sticky bottom CTA ===== -->
+  <div class="sticky-cta" id="stickyCta" role="region" aria-label="Booking call to action">
+    <span class="sticky-cta__text">Ready to shoot your next drop?</span>
+    <a class="cta-pill" href="#book">Book a face →</a>
+  </div>
+
   <!-- ===== Lightbox ===== -->
   <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Project gallery" aria-hidden="true">
     <button class="lb-close" id="lbClose" type="button" aria-label="Close">&times;</button>
@@ -672,6 +762,36 @@
     <button class="lb-nav lb-next" id="lbNext" type="button" aria-label="Next image">&#8250;</button>
     <div class="lb-caption" id="lbCaption"></div>
   </div>
+
+  <script>
+    /* ===== CTAs: announcement dismiss + sticky bottom bar ===== */
+    (function () {
+      // Announcement bar — dismiss persists for the session
+      const announce = document.getElementById("announce");
+      const anncClose = document.getElementById("anncClose");
+      if (announce && sessionStorage.getItem("anncDismissed") === "1") {
+        document.body.classList.add("annc-off");
+      }
+      if (anncClose) {
+        anncClose.addEventListener("click", function () {
+          document.body.classList.add("annc-off");
+          try { sessionStorage.setItem("anncDismissed", "1"); } catch (e) {}
+        });
+      }
+
+      // Sticky bottom bar — show only once the hero has scrolled out of view
+      const sticky = document.getElementById("stickyCta");
+      const hero = document.getElementById("hero");
+      if (sticky && hero && "IntersectionObserver" in window) {
+        const io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            sticky.classList.toggle("show", !entry.isIntersecting);
+          });
+        }, { threshold: 0 });
+        io.observe(hero);
+      }
+    })();
+  </script>
 
   <script>
     /* ===== Lightbox ===== */
