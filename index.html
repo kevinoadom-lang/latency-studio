@@ -397,11 +397,109 @@
   .step p { margin: 0; color: var(--muted); line-height: 1.55; }
 
   /* Pricing */
-  .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; max-width: 1040px; margin: 0 auto; }
-  .price-card { border: 1px solid var(--line); border-radius: 14px; padding: 36px 30px; display: flex; flex-direction: column; }
-  .price-card h3 { margin: 0 0 22px; font-size: 22px; font-weight: 700; }
-  .price-card ul { list-style: none; padding: 0; margin: 0 0 28px; }
-  .price-card li { padding: 9px 0; border-bottom: 1px solid var(--line); color: var(--muted); }
+  .price-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+  max-width: 1040px;
+  margin: 0 auto;
+  align-items: stretch;
+}
+.price-card {
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 0.5px solid var(--line);
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+.pc-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 24px 20px;
+}
+.pc-cta {
+  margin-top: auto;
+}
+.pc-cta--dark {
+  background: var(--ink);
+  color: #fff;
+  border: none;
+}
+  /* Full-width banner strip flush inside the top border */
+  .pc-banner {
+    padding: 8px 20px; text-align: center;
+    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  }
+  /* Body holds the padded content (banner stays edge-to-edge) */
+  .pc-body { padding: 32px 28px; display: flex; flex-direction: column; flex: 1; }
+  .pc-body h3 { margin: 0 0 16px; font-size: 22px; font-weight: 700; }
+  .pc-desc { color: var(--muted); font-size: 14px; line-height: 1.55; margin: 0 0 20px; }
+  .pc-body ul { list-style: none; padding: 0; margin: 0 0 28px; }
+  .pc-body li { padding: 9px 0; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 14px; }
+  .pc-price { font-size: 22px; font-weight: 700; margin: 0 0 16px; }
+  .pc-per { font-size: 14px; font-weight: 400; color: var(--muted); }
+  .pc-save { font-size: 12px; color: var(--muted); margin: -8px 0 16px; }
+
+  /* Card CTAs */
+  .pc-cta {
+    display: inline-block; text-align: center; width: 100%; box-sizing: border-box;
+    padding: 13px 22px; border-radius: 999px; font: inherit; font-size: 14px;
+    text-decoration: none; cursor: pointer; border: 1px solid transparent;
+    transition: opacity .2s ease;
+  }
+  .pc-cta:hover { opacity: 0.85; }
+  .pc-cta--ghost { background: none; border-color: var(--ink); color: var(--ink); }
+  .pc-cta--solid { background: var(--ink); border-color: var(--ink); color: #fff; }
+  .pc-cta--dark {
+  background: var(--ink);
+  color: #fff;
+  border: none;
+}
+
+  /* Exclusive silver badge (Signature) */
+  .pc-badge {
+    display: inline-block; align-self: flex-start; margin: 0 0 18px;
+    font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase;
+    border-radius: 999px; padding: 4px 10px; color: #333; font-weight: 500;
+    background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 40%, #c8c8c8 100%);
+    border: 0.5px solid rgba(255,255,255,0.8);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.9), 0 1px 3px rgba(0,0,0,0.12);
+  }
+
+  /* Seasonal / Annual segmented toggle */
+  .pc-toggle {
+    display: inline-flex; align-self: flex-start; gap: 4px; padding: 3px;
+    border-radius: 999px; background: rgba(0,0,0,0.05); margin: 0 0 24px;
+  }
+  .pc-toggle button {
+    border: 0; background: none; cursor: pointer; font: inherit; font-size: 12px;
+    letter-spacing: 0.03em; padding: 6px 16px; border-radius: 999px; color: var(--muted);
+    transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+  }
+  .pc-toggle button.active { background: #fff; color: var(--ink); box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+
+  /* Signature — heavier border + dark banner */
+  .price-card--signature { border: 1.5px solid var(--ink); }
+  .price-card--signature .pc-banner { background: var(--ink); color: #fff; }
+
+  .price-card--campaign { 
+  background: var(--bg); 
+  border: 0.5px solid var(--line); 
+  border-top: 4px solid var(--ink);
+}
+.price-card--campaign .pc-banner {
+  background: var(--ink);
+  color: #fff;
+}
+.price-card--campaign h3 { color: var(--ink); }
+.price-card--campaign .pc-desc { color: var(--muted); }
+.price-card--campaign li { color: var(--muted); border-bottom-color: var(--line); }
+.price-card--campaign .pc-price { color: var(--ink); }
+.price-card--campaign .pc-per { color: var(--muted); }
+  /* Legacy button (still used elsewhere, e.g. How it works) */
   .btn {
     display: inline-block; text-align: center; padding: 13px 22px; border-radius: 999px;
     background: var(--ink); color: #fff; text-decoration: none; border: 0; font: inherit; cursor: pointer;
@@ -475,7 +573,6 @@
     <button class="close" id="menuClose" type="button" aria-label="Close menu">&times;</button>
     <a href="#roster">Roster</a>
     <a href="#work">Work</a>
-    <a href="#how">About</a>
     <a href="#book">Book</a>
   </nav>
 
@@ -702,50 +799,7 @@
   <section class="block" id="pricing">
   <div class="wrap">
     <span class="eyebrow label">Pricing</span>
-    <div class="price-grid">
-      <div class="price-card">
-        <h3>Essential</h3>
-        <p style="color:var(--muted);font-size:14px;line-height:1.55;margin:0 0 20px;">One-off shoots, shared talent. The fastest way to get your product on a Latent model — flexible, with no long-term arrangement.</p>
-        <ul>
-          <li>Access to the full Essential roster</li>
-          <li>12–15 hand-reviewed finals per shoot</li>
-          <li>48–72h delivery</li>
-          <li>One revision round included</li>
-          <li>No exclusivity - Available to any brand</li>
-        </ul>
-        <div style="font-size:22px;font-weight:700;margin:0 0 20px;">From £600 <span style="font-size:14px;font-weight:400;color:var(--muted);">per shoot</span></div>
-        <a class="btn block" href="#book">Get in touch</a>
-      </div>
-      <div class="price-card">
-        <h3>Signature</h3>
-        <p style="color:var(--muted);font-size:14px;line-height:1.55;margin:0 0 20px;">An exclusive talent for your brand. Same model, every shoot — building recognition across your entire product world.</p>
-        <ul>
-          <li>Exclusive access — one brand per category</li>
-          <li>Unlimited shoots during licence term</li>
-          <li>12–15 hand-reviewed finals per shoot</li>
-          <li>48–72h delivery</li>
-          <li>Character consistency locked across all shoots</li>
-          <li>Priority turnaround</li>
-        </ul>
-        <div style="font-size:22px;font-weight:700;margin:0 0 20px;">From £1,500 <span style="font-size:14px;font-weight:400;color:var(--muted);">per season</span></div>
-        <a class="btn block" href="#book">Book a Signature talent</a>
-      </div>
-      <div class="price-card">
-        <h3>Campaign</h3>
-        <p style="color:var(--muted);font-size:14px;line-height:1.55;margin:0 0 20px;">Bespoke creative-directed shoots. Scene building, art direction, and editorial imagery — quoted per brief.</p>
-        <ul>
-          <li>Bespoke quote per project</li>
-          <li>Full creative direction included</li>
-          <li>Scene building and styling</li>
-          <li>Available to Essential and Signature brands</li>
-          <li>Turnaround agreed per brief</li>
-        </ul>
-        <div style="font-size:22px;font-weight:700;margin:0 0 20px;">Quoted <span style="font-size:14px;font-weight:400;color:var(--muted);">per brief</span></div>
-        <a class="btn block" href="#book">Discuss a campaign</a>
-      </div>
-    </div>
-
-    <div style="margin:64px auto 0;max-width:760px;">
+    <div style="margin:0 auto 48px;max-width:760px;">
       <p style="text-align:center;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin:0 0 28px;">What a traditional shoot would cost you</p>
       <table style="width:100%;border-collapse:collapse;font-size:14px;">
         <thead>
@@ -799,7 +853,74 @@
         </tbody>
       </table>
     </div>
+    </div>
+    </table>
+    </div>
 
+    <div class="price-grid">
+
+      <!-- Essential -->
+      <div class="price-card price-card--essential">
+        <div class="pc-body">
+          <h3>Essential</h3>
+          <p class="pc-desc">One-off shoots, shared talent. The fastest way to get your product on a Latency model — flexible, with no long-term arrangement.</p>
+          <ul>
+            <li>Access to the full Essential roster</li>
+            <li>12–15 hand-reviewed finals per shoot</li>
+            <li>48–72h delivery</li>
+            <li>One revision round included</li>
+            <li>Available to any brand</li>
+          </ul>
+          <div class="pc-price">From £600 <span class="pc-per">per shoot</span></div>
+          <a class="pc-cta pc-cta--ghost" href="#book">Get in touch</a>
+        </div>
+      </div>
+
+      <!-- Signature -->
+      <div class="price-card price-card--signature">
+        <div class="pc-banner">Recommended</div>
+        <div class="pc-body">
+          <h3>Signature</h3>
+          <span class="pc-badge">Exclusive</span>
+          <p class="pc-desc">One talent, locked exclusively to your brand for the duration of your licence. Building a visual identity your customers start to recognise. Contracted to your brand alone.</p>
+          <div class="pc-toggle" id="sigToggle" role="group" aria-label="Billing period">
+            <button type="button" data-plan="seasonal" class="active">Seasonal</button>
+            <button type="button" data-plan="annual">Annual</button>
+          </div>
+          <ul>
+            <li>Exclusive access — one brand per category</li>
+            <li>Unlimited shoots during licence term</li>
+            <li>12–15 hand-reviewed finals per shoot</li>
+            <li>48–72h delivery</li>
+            <li>Character consistency locked across all shoots</li>
+            <li>Priority turnaround</li>
+          </ul>
+          <div class="pc-price" id="sigPrice">From £1,500 <span class="pc-per">per season</span></div>
+          <div class="pc-save" id="sigSave" hidden>Save £1,500 vs seasonal</div>
+          <a class="pc-cta pc-cta--solid" href="#book">Book a Signature talent</a>
+        </div>
+      </div>
+
+      <!-- Campaign -->
+      <div class="price-card price-card--campaign">
+        <div class="pc-banner">Bespoke</div>
+        <div class="pc-body">
+          <h3>Campaign</h3>
+          <p class="pc-desc">Bespoke creative-directed shoots. Scene building, art direction, and editorial imagery — quoted per brief.</p>
+          <ul>
+            <li>Bespoke quote per project</li>
+            <li>Full creative direction included</li>
+            <li>Scene building and styling</li>
+            <li>Available to Essential and Signature brands</li>
+            <li>Turnaround agreed per brief</li>
+          </ul>
+          <div class="pc-price">Quoted <span class="pc-per">per brief</span></div>
+          <a class="pc-cta pc-cta--dark" href="#book">Discuss a campaign</a>
+        </div>
+      </div>
+    </div>
+
+    
   </div>
 </section>
 
@@ -840,24 +961,26 @@
     </div>
   </section>
 
-  <!-- ===== Book / Enquiry ===== -->
-  <section class="block" id="book">
-    <div class="wrap">
-      <span class="eyebrow label">Book</span>
-      <form class="form" onsubmit="return false;">
-        <label>Name
-          <input type="text" name="name" placeholder="Your name" />
-        </label>
-        <label>Brand
-          <input type="text" name="brand" placeholder="Company or brand" />
-        </label>
-        <label>What are you looking for
-          <textarea name="brief" placeholder="Tell us about the project"></textarea>
-        </label>
-        <button class="btn" type="submit">Submit</button>
-      </form>
-    </div>
-  </section>
+ <!-- ===== Book / Enquiry ===== -->
+<section class="block" id="book">
+  <div class="wrap">
+    <span class="eyebrow label">Book</span>
+    <h2 style="text-align:center;font-size:clamp(1.8rem,5vw,3rem);font-weight:800;letter-spacing:-0.02em;margin:16px 0 12px;">Start here.</h2>
+    <p style="text-align:center;color:var(--muted);font-size:15px;margin:0 0 48px;">Tell us about your project and we'll come back within 24 hours.</p>
+    <form class="form" onsubmit="return false;">
+      <label>Name
+        <input type="text" name="name" placeholder="Your name" />
+      </label>
+      <label>Brand
+        <input type="text" name="brand" placeholder="Company or brand" />
+      </label>
+      <label>What are you looking for
+        <textarea name="brief" placeholder="Tell us about the project"></textarea>
+      </label>
+      <button class="btn" type="submit">Submit</button>
+    </form>
+  </div>
+</section>
 
   <!-- ===== Footer ===== -->
   <footer class="footer">
@@ -865,7 +988,6 @@
     <div class="links label">
       <a href="#roster">Roster</a>
       <a href="#work">Work</a>
-      <a href="#how">About</a>
       <a href="#book">Book</a>
     </div>
   </footer>
@@ -1201,6 +1323,29 @@
 
       paint();
       live.textContent = ROSTER[0].name;
+    })();
+  </script>
+
+  <script>
+    // ---- Signature pricing: Seasonal / Annual toggle ----
+    (function () {
+      const toggle = document.getElementById("sigToggle");
+      const price  = document.getElementById("sigPrice");
+      const save   = document.getElementById("sigSave");
+      if (!toggle || !price) return;
+      const PLANS = {
+        seasonal: { html: 'From £1,500 <span class="pc-per">per season</span>', save: false },
+        annual:   { html: 'From £4,500 <span class="pc-per">per year</span>',   save: true  },
+      };
+      const buttons = toggle.querySelectorAll("button");
+      function setPlan(plan) {
+        const p = PLANS[plan];
+        if (!p) return;
+        price.innerHTML = p.html;
+        save.hidden = !p.save;
+        buttons.forEach((b) => b.classList.toggle("active", b.getAttribute("data-plan") === plan));
+      }
+      buttons.forEach((b) => b.addEventListener("click", () => setPlan(b.getAttribute("data-plan"))));
     })();
   </script>
 
