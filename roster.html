@@ -126,10 +126,11 @@
 
   /* Tier badges */
   .tier { font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; border-radius: 999px; padding: 3px 8px; }
-  .tier--sig {
-    background: rgba(0,0,0,0.08);
-    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-    border: 0.5px solid rgba(0,0,0,0.12); color: var(--ink); font-weight: 500;
+  .tier--sig {                                   /* Signature — premium silver gradient pill */
+    background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 40%, #c8c8c8 100%);
+    border: 0.5px solid rgba(255,255,255,0.8);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.9), 0 1px 3px rgba(0,0,0,0.12);
+    color: #333; font-weight: 500;
   }
   .tier--stock { background: none; border: 0.5px solid var(--line); color: var(--muted); font-weight: 400; }
 
@@ -319,7 +320,7 @@
     };
     var ORDER = ["sofia", "felix", "yuna", "valentina"];
 
-    function tierLabel(t) { return t === "sig" ? "Signature" : "Stock"; }
+    function tierLabel(t) { return t === "sig" ? "Signature" : "Essential"; }
     function tierClass(t) { return t === "sig" ? "tier--sig" : "tier--stock"; }
 
     function specRows(specs) {
@@ -402,7 +403,7 @@
         pfSpec.innerHTML = specRows(c.specs);
         pfTags.innerHTML = c.tags.map(function (t) { return '<span class="pf-tag">' + t + '</span>'; }).join("");
         pfPricing.innerHTML =
-          '<div class="pf-price-row"><span>Stock</span><span>' + c.priceStock + '</span></div>' +
+          '<div class="pf-price-row"><span>Essential</span><span>' + c.priceStock + '</span></div>' +
           '<div class="pf-price-row"><span>Signature</span><span>' + c.priceSig + '</span></div>';
         if (c.tier === "sig") {
           pfAvail.className = "pf-avail is-booked";

@@ -124,6 +124,29 @@
   .name.show { opacity: 0.9; }
 
   /* ---- Hint ---- */
+  /* Value-prop line — same family as the hint pill, sitting just above it */
+  .hero-vp {
+    position: absolute;
+    left: 50%;
+    bottom: calc(6% + 42px);
+    transform: translateX(-50%);
+    max-width: min(92vw, 560px);
+    text-align: center;
+    padding: 6px 15px;
+    border-radius: 999px;
+    background: rgba(20, 20, 20, 0.3);
+    color: rgba(255, 255, 255, 0.92);
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 0.14em;
+    line-height: 1.3;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    pointer-events: none;
+    z-index: 4;
+    margin: 0;
+  }
+
   .hint {
     position: absolute;
     left: 50%;
@@ -278,8 +301,8 @@
   section.block { padding: 140px 0; }
   .eyebrow { display: block; text-align: center; margin-bottom: 52px; color: var(--muted); }
 
-  /* Statement */
-  .statement { padding: 210px 0; }
+  /* Statement — sits tight under the hero so it reads as one unit */
+  .statement { padding: 56px 0 104px; }
   .statement p {
     max-width: 16ch; margin: 0 auto; text-align: center; font-weight: 800;
     line-height: 1.04; letter-spacing: -0.02em; font-size: clamp(2.2rem, 7vw, 5.5rem);
@@ -295,13 +318,13 @@
 
   /* Tier badges */
   .tier { font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; border-radius: 999px; padding: 3px 8px; }
-  .tier--sig {                                   /* Signature — frosted glass pill */
-    background: rgba(0, 0, 0, 0.08);
-    -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-    border: 0.5px solid rgba(0, 0, 0, 0.12);
-    color: var(--ink); font-weight: 500;
+  .tier--sig {                                   /* Signature — premium silver gradient pill */
+    background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 40%, #c8c8c8 100%);
+    border: 0.5px solid rgba(255, 255, 255, 0.8);
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.9), 0 1px 3px rgba(0, 0, 0, 0.12);
+    color: #333; font-weight: 500;
   }
-  .tier--stock {                                 /* Stock — ghost pill */
+  .tier--stock {                                 /* Essential — ghost pill */
     background: none;
     border: 0.5px solid var(--line);
     color: var(--muted); font-weight: 400;
@@ -397,7 +420,7 @@
   .step p { margin: 0; color: var(--muted); line-height: 1.55; }
 
   /* Pricing */
-  .price-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 28px; max-width: 760px; margin: 0 auto; }
+  .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; max-width: 1040px; margin: 0 auto; }
   .price-card { border: 1px solid var(--line); border-radius: 14px; padding: 36px 30px; display: flex; flex-direction: column; }
   .price-card h3 { margin: 0 0 22px; font-size: 22px; font-weight: 700; }
   .price-card ul { list-style: none; padding: 0; margin: 0 0 28px; }
@@ -427,7 +450,7 @@
   @media (max-width: 760px) {
     .hero { height: 78vh; height: 78svh; }   /* defined height — next section peeks */
     section.block { padding: 92px 0; }
-    .statement { padding: 124px 0; }
+    .statement { padding: 36px 0 68px; }
     .roster-grid { grid-template-columns: repeat(2, 1fr); gap: 18px; }
 
     /* Selected Works — horizontal snap carousel (peeking next card) */
@@ -458,7 +481,7 @@
   <!-- ===== Announcement bar ===== -->
   <div class="announce" id="announce" role="region" aria-label="Announcement">
     <span class="announce__text">AI e-comm imagery for DTC brands — no studio, no day rate.</span>
-    <a class="cta-pill announce__cta" href="#book">Book your first drop →</a>
+    <a class="cta-pill announce__cta" href="#book">Book your first shoot →</a>
     <button class="announce__close" id="anncClose" type="button" aria-label="Dismiss announcement">&times;</button>
   </div>
 
@@ -485,7 +508,7 @@
     id="hero"
     role="button"
     tabindex="0"
-    aria-label="Character showcase. Move the cursor to reveal the next face through the lens; click to lock it in. Arrow keys also work."
+    aria-label="Character showcase. Move the cursor to reveal the next talent through the lens; click to lock it in. Arrow keys also work."
   >
     <div class="stage" id="stage">
       <div class="figure" id="figure"></div>
@@ -526,6 +549,8 @@
       <div class="name" id="name" aria-hidden="true"></div>
     </div>
 
+    <p class="hero-vp">An AI studio giving DTC brands a cast of models they own.</p>
+
     <div class="hint" id="hint" aria-hidden="true">Move to reveal · click to lock</div>
 
     <button class="next-btn" id="nextBtn" type="button" aria-label="Lock in next character">›</button>
@@ -538,6 +563,70 @@
       <p>Your e-comm imagery. Shot, styled, delivered in 48 hours powered by AI.</p>
     </div>
   </section>
+
+  <!-- ===== How it works ===== -->
+  <section class="block" id="how">
+  <div class="wrap">
+    <span class="eyebrow label">How it works</span>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;margin-top:64px;">
+
+      <!-- Left: transformation visual -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;">
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="aspect-ratio:3/4;overflow:hidden;border-radius:8px;background:#f3f3f3;">
+            <img src="yuna-our-legacy-hoodie.webp" alt="Product input" style="width:100%;height:100%;object-fit:cover;object-position:center;" />
+          </div>
+          <span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);">You send this</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="aspect-ratio:3/4;overflow:hidden;border-radius:8px;background:#f3f3f3;">
+            <img src="processed/Yuna.png" alt="Finished e-comm shot" style="width:100%;height:100%;object-fit:cover;object-position:center top;" />
+          </div>
+          <span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);">We deliver this</span>
+        </div>
+      </div>
+
+      <!-- Right: steps -->
+      <div style="display:flex;flex-direction:column;gap:48px;">
+        <div style="display:flex;gap:24px;align-items:flex-start;">
+          <span style="font-size:64px;font-weight:800;line-height:1;color:rgba(0,0,0,0.06);flex-shrink:0;margin-top:-8px;">01</span>
+          <div>
+            <h3 style="margin:0 0 8px;font-size:18px;font-weight:600;">Pick a talent</h3>
+            <p style="margin:0;color:var(--muted);line-height:1.6;">Choose from our roster - Essential for a one-off shoot, Signature if you want that talent to become part of your brand.
+</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:24px;align-items:flex-start;">
+          <span style="font-size:64px;font-weight:800;line-height:1;color:rgba(0,0,0,0.06);flex-shrink:0;margin-top:-8px;">02</span>
+          <div>
+            <h3 style="margin:0 0 8px;font-size:18px;font-weight:600;">Send your product</h3>
+            <p style="margin:0;color:var(--muted);line-height:1.6;">Ship us your product or send flat-lays. We handle the creative direction, styling, and shoot.</p>
+          </div>
+        </div>
+        <div style="display:flex;gap:24px;align-items:flex-start;">
+          <span style="font-size:64px;font-weight:800;line-height:1;color:rgba(0,0,0,0.06);flex-shrink:0;margin-top:-8px;">03</span>
+          <div>
+            <h3 style="margin:0 0 8px;font-size:18px;font-weight:600;">Assets delivered</h3>
+            <p style="margin:0;color:var(--muted);line-height:1.6;">Hand-reviewed, e-comm ready imagery in 48–72 hours. Studio quality, without the overhead.</p>
+          </div>
+        </div>
+        <a href="#book" class="btn" style="align-self:flex-start;">Start your first shoot →</a>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Mobile styles -->
+  <style>
+    @media (max-width: 760px) {
+      #how .wrap > div[style*="grid-template-columns:1fr 1fr"] {
+        grid-template-columns: 1fr !important;
+        gap: 48px !important;
+      }
+    }
+  </style>
+</section>
 
   <!-- ===== Roster ===== -->
   <section class="block" id="roster">
@@ -573,12 +662,12 @@
                 <div><dt>Hair</dt><dd>Bleached blonde close crop</dd></div>
                 <div><dt>Eyes</dt><dd>Blue-grey</dd></div>
                 <div><dt>Build</dt><dd>Lean broad shoulder</dd></div>
-                <div><dt>Tier</dt><dd>Stock</dd></div>
+                <div><dt>Tier</dt><dd>Essential</dd></div>
                 <div><dt>Status</dt><dd>Available</dd></div>
               </dl>
             </div>
           </div>
-          <div class="meta"><span class="nm">Felix</span><span class="tier tier--stock">Stock</span></div>
+          <div class="meta"><span class="nm">Felix</span><span class="tier tier--stock">Essential</span></div>
         </div>
         <div class="card-fig" tabindex="0">
           <div class="ph">
@@ -609,12 +698,12 @@
                 <div><dt>Hair</dt><dd>Dark brown short textured</dd></div>
                 <div><dt>Eyes</dt><dd>Dark brown</dd></div>
                 <div><dt>Build</dt><dd>Slim angular</dd></div>
-                <div><dt>Tier</dt><dd>Stock</dd></div>
+                <div><dt>Tier</dt><dd>Essential</dd></div>
                 <div><dt>Status</dt><dd>Available</dd></div>
               </dl>
             </div>
           </div>
-          <div class="meta"><span class="nm">Valentina</span><span class="tier tier--stock">Stock</span></div>
+          <div class="meta"><span class="nm">Valentina</span><span class="tier tier--stock">Essential</span></div>
         </div>
       </div>
 
@@ -623,131 +712,31 @@
       </div>
 
       <div class="roster-copy">
-        <p>A cast of AI models built for e-commerce. Each face is distinct, consistent, and available to put on your product.</p>
+        <p>A cast of AI models built for e-commerce. Each talent is distinct, consistent, and available to put on your product.</p>
         <p><span class="tier-name">Signature</span> —  One talent, locked exclusively to your brand for the duration of your licence. Building a visual identity your customers start to recognise. Contracted to your brand alone..
 
 
 
 </p>
-        <p><span class="tier-name">Stock</span> — Book a talent from our shared roster whenever you need them. Fast, flexible, and available to any brand.</p>
+        <p><span class="tier-name">Essential</span> — Book a talent from our shared roster whenever you need them. Fast, flexible, and available to any brand.</p>
       </div>
     </div>
   </section>
 
-  <!-- ===== Work ===== -->
-  <section class="block" id="work">
-    <div class="wrap">
-      <span class="eyebrow label">Selected work</span>
-      <div class="work-grid">
-        <button class="work-item" type="button" data-project="0">
-          <img src="Selected%20Works%20-%20Sofia%20Timeless%20Cab.png" alt="Aether Studios — with Sofia" style="object-position: center 40%;" />
-          <span class="work-hover"></span>
-          <span class="work-grad"></span>
-          <span class="work-meta"><span class="work-brand">Aether Studios</span><span class="work-who">with Sofia</span></span>
-          <span class="work-cta">View collection</span>
-        </button>
-        <button class="work-item" type="button" data-project="1">
-          <img src="Selected%20Works%20-%20Felix%20Street%20Crossing.png" alt="Nocturne — with Felix" style="object-position: center 10%;" />
-          <span class="work-hover"></span>
-          <span class="work-grad"></span>
-          <span class="work-meta"><span class="work-brand">Nocturne</span><span class="work-who">with Felix</span></span>
-          <span class="work-cta">View collection</span>
-        </button>
-        <button class="work-item" type="button" data-project="2">
-          <img src="Selected%20Works%20-%20Eleanor%20Doorbell.png" alt="Halo Labs — with Yuna" />
-          <span class="work-hover"></span>
-          <span class="work-grad"></span>
-          <span class="work-meta"><span class="work-brand">Halo Labs</span><span class="work-who">with Yuna</span></span>
-          <span class="work-cta">View collection</span>
-        </button>
-        <button class="work-item" type="button" data-project="3">
-          <img src="Selected%20Works%20-%20Valentina%20Interior.png" alt="Vantage — with Valentina" />
-          <span class="work-hover"></span>
-          <span class="work-grad"></span>
-          <span class="work-meta"><span class="work-brand">Vantage</span><span class="work-who">with Valentina</span></span>
-          <span class="work-cta">View collection</span>
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== How it works ===== -->
-  <section class="block" id="how">
-  <div class="wrap">
-    <span class="eyebrow label">How it works</span>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;margin-top:64px;">
-
-      <!-- Left: transformation visual -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;">
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="aspect-ratio:3/4;overflow:hidden;border-radius:8px;background:#f3f3f3;">
-            <img src="yuna-our-legacy-hoodie.webp" alt="Product input" style="width:100%;height:100%;object-fit:cover;object-position:center;" />
-          </div>
-          <span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);">You send this</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="aspect-ratio:3/4;overflow:hidden;border-radius:8px;background:#f3f3f3;">
-            <img src="processed/Yuna.png" alt="Finished e-comm shot" style="width:100%;height:100%;object-fit:cover;object-position:center top;" />
-          </div>
-          <span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);">We deliver this</span>
-        </div>
-      </div>
-
-      <!-- Right: steps -->
-      <div style="display:flex;flex-direction:column;gap:48px;">
-        <div style="display:flex;gap:24px;align-items:flex-start;">
-          <span style="font-size:64px;font-weight:800;line-height:1;color:rgba(0,0,0,0.06);flex-shrink:0;margin-top:-8px;">01</span>
-          <div>
-            <h3 style="margin:0 0 8px;font-size:18px;font-weight:600;">Pick a talent</h3>
-            <p style="margin:0;color:var(--muted);line-height:1.6;">Choose from our roster - Stock for a one-off drop, Signature if you want that talent to become part of your brand.
-</p>
-          </div>
-        </div>
-        <div style="display:flex;gap:24px;align-items:flex-start;">
-          <span style="font-size:64px;font-weight:800;line-height:1;color:rgba(0,0,0,0.06);flex-shrink:0;margin-top:-8px;">02</span>
-          <div>
-            <h3 style="margin:0 0 8px;font-size:18px;font-weight:600;">Send your product</h3>
-            <p style="margin:0;color:var(--muted);line-height:1.6;">Ship us your product or send flat-lays. We handle the creative direction, styling, and shoot.</p>
-          </div>
-        </div>
-        <div style="display:flex;gap:24px;align-items:flex-start;">
-          <span style="font-size:64px;font-weight:800;line-height:1;color:rgba(0,0,0,0.06);flex-shrink:0;margin-top:-8px;">03</span>
-          <div>
-            <h3 style="margin:0 0 8px;font-size:18px;font-weight:600;">Assets delivered</h3>
-            <p style="margin:0;color:var(--muted);line-height:1.6;">Hand-reviewed, e-comm ready imagery in 48–72 hours. Studio quality, without the overhead.</p>
-          </div>
-        </div>
-        <a href="#book" class="btn" style="align-self:flex-start;">Start your first drop →</a>
-      </div>
-
-    </div>
-  </div>
-
-  <!-- Mobile styles -->
-  <style>
-    @media (max-width: 760px) {
-      #how .wrap > div[style*="grid-template-columns:1fr 1fr"] {
-        grid-template-columns: 1fr !important;
-        gap: 48px !important;
-      }
-    }
-  </style>
-</section>
   <!-- ===== Pricing ===== -->
   <section class="block" id="pricing">
   <div class="wrap">
     <span class="eyebrow label">Pricing</span>
     <div class="price-grid">
       <div class="price-card">
-        <h3>Stock</h3>
-        <p style="color:var(--muted);font-size:14px;line-height:1.55;margin:0 0 20px;">One-off drops, shared faces. The fastest way to get your product on a Latent model — no commitment or exclusivity.</p>
+        <h3>Essential</h3>
+        <p style="color:var(--muted);font-size:14px;line-height:1.55;margin:0 0 20px;">One-off drops, shared talent. The fastest way to get your product on a Latent model — flexible, with no long-term arrangement.</p>
         <ul>
-          <li>Access to the full stock roster</li>
+          <li>Access to the full Essential roster</li>
           <li>12–15 hand-reviewed finals per drop</li>
           <li>48–72h delivery</li>
           <li>One revision round included</li>
-          <li>No exclusivity — face is shared</li>
+          <li>No exclusivity - Available to any brand</li>
         </ul>
         <div style="font-size:22px;font-weight:700;margin:0 0 20px;">From £600 <span style="font-size:14px;font-weight:400;color:var(--muted);">per drop</span></div>
         <a class="btn block" href="#book">Get in touch</a>
@@ -765,6 +754,19 @@
         </ul>
         <div style="font-size:22px;font-weight:700;margin:0 0 20px;">From £1,500 <span style="font-size:14px;font-weight:400;color:var(--muted);">per season</span></div>
         <a class="btn block" href="#book">Book a Signature face</a>
+      </div>
+      <div class="price-card">
+        <h3>Campaign</h3>
+        <p style="color:var(--muted);font-size:14px;line-height:1.55;margin:0 0 20px;">Bespoke creative-directed shoots. Scene building, art direction, and editorial imagery — quoted per brief.</p>
+        <ul>
+          <li>Bespoke quote per project</li>
+          <li>Full creative direction included</li>
+          <li>Scene building and styling</li>
+          <li>Available to Essential and Signature brands</li>
+          <li>Turnaround agreed per brief</li>
+        </ul>
+        <div style="font-size:22px;font-weight:700;margin:0 0 20px;">Quoted <span style="font-size:14px;font-weight:400;color:var(--muted);">per brief</span></div>
+        <a class="btn block" href="#book">Discuss a campaign</a>
       </div>
     </div>
 
@@ -826,6 +828,42 @@
   </div>
 </section>
 
+  <!-- ===== Work ===== -->
+  <section class="block" id="work">
+    <div class="wrap">
+      <span class="eyebrow label">Selected work</span>
+      <div class="work-grid">
+        <button class="work-item" type="button" data-project="0">
+          <img src="Selected%20Works%20-%20Sofia%20Timeless%20Cab.png" alt="Coming soon — with Sofia" style="object-position: center 40%;" />
+          <span class="work-hover"></span>
+          <span class="work-grad"></span>
+          <span class="work-meta"><span class="work-brand">Coming soon</span><span class="work-who">with Sofia</span></span>
+          <span class="work-cta">View collection</span>
+        </button>
+        <button class="work-item" type="button" data-project="1">
+          <img src="Selected%20Works%20-%20Felix%20Street%20Crossing.png" alt="Coming soon — with Felix" style="object-position: center 10%;" />
+          <span class="work-hover"></span>
+          <span class="work-grad"></span>
+          <span class="work-meta"><span class="work-brand">Coming soon</span><span class="work-who">with Felix</span></span>
+          <span class="work-cta">View collection</span>
+        </button>
+        <button class="work-item" type="button" data-project="2">
+          <img src="Selected%20Works%20-%20Eleanor%20Doorbell.png" alt="Coming soon — with Yuna" />
+          <span class="work-hover"></span>
+          <span class="work-grad"></span>
+          <span class="work-meta"><span class="work-brand">Coming soon</span><span class="work-who">with Yuna</span></span>
+          <span class="work-cta">View collection</span>
+        </button>
+        <button class="work-item" type="button" data-project="3">
+          <img src="Selected%20Works%20-%20Valentina%20Interior.png" alt="Coming soon — with Valentina" />
+          <span class="work-hover"></span>
+          <span class="work-grad"></span>
+          <span class="work-meta"><span class="work-brand">Coming soon</span><span class="work-who">with Valentina</span></span>
+          <span class="work-cta">View collection</span>
+        </button>
+      </div>
+    </div>
+  </section>
 
   <!-- ===== Book / Enquiry ===== -->
   <section class="block" id="book">
@@ -859,8 +897,8 @@
 
   <!-- ===== Sticky bottom CTA ===== -->
   <div class="sticky-cta" id="stickyCta" role="region" aria-label="Booking call to action">
-    <span class="sticky-cta__text">Ready to shoot your next drop?</span>
-    <a class="cta-pill" href="#book">Book a face →</a>
+    <span class="sticky-cta__text">Ready for your next shoot?</span>
+    <a class="cta-pill" href="#book">Book a talent →</a>
   </div>
 
   <!-- ===== Lightbox ===== -->
@@ -906,10 +944,10 @@
     /* ===== Lightbox ===== */
     (function () {
       const PROJECTS = [
-        { brand: "Aether Studios", who: "with Sofia",     images: ["Selected Works - Sofia Timeless Cab.png"] },
-        { brand: "Nocturne",       who: "with Felix",     images: ["Selected Works - Felix Street Crossing.png"] },
-        { brand: "Halo Labs",      who: "with Yuna",      images: ["Selected Works - Eleanor Doorbell.png"] },
-        { brand: "Vantage",        who: "with Valentina", images: ["Selected Works - Valentina Interior.png"] },
+        { brand: "Coming soon", who: "with Sofia",     images: ["Selected Works - Sofia Timeless Cab.png"] },
+        { brand: "Coming soon",       who: "with Felix",     images: ["Selected Works - Felix Street Crossing.png"] },
+        { brand: "Coming soon",      who: "with Yuna",      images: ["Selected Works - Eleanor Doorbell.png"] },
+        { brand: "Coming soon",        who: "with Valentina", images: ["Selected Works - Valentina Interior.png"] },
       ];
 
       const lb       = document.getElementById("lightbox");
