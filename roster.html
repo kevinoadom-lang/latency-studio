@@ -114,7 +114,7 @@
   .rp-toggle button.active { background: var(--ink); color: #fff; border-color: var(--ink); }
 
   /* Grid (column count driven by --cols) */
-  .rp-grid { display: grid; grid-template-columns: repeat(var(--cols, 4), 1fr); gap: 28px; }
+  .rp-grid { display: grid; grid-template-columns: repeat(var(--cols, 3), 1fr); gap: 28px; }
   .rp-card { display: flex; flex-direction: column; align-items: center; gap: 14px; }
 
   .card-fig { width: 100%; }
@@ -249,11 +249,11 @@
       <div class="rp-toggle" id="rpToggle" role="group" aria-label="Grid columns">
         <button type="button" data-cols="1" aria-label="One column">1</button>
         <button type="button" data-cols="2" aria-label="Two columns">2</button>
-        <button type="button" data-cols="4" class="active" aria-label="Four columns">4</button>
+        <button type="button" data-cols="3" class="active" aria-label="Three columns">3</button>
       </div>
     </div>
 
-    <div class="rp-grid" id="rpGrid" style="--cols:4;"><!-- cards injected by JS --></div>
+    <div class="rp-grid" id="rpGrid" style="--cols:3;"><!-- cards injected by JS --></div>
   </main>
 
   <!-- ===== Footer ===== -->
@@ -293,32 +293,44 @@
   <script>
     /* ===== Character data ===== */
     var CHARACTERS = {
-      sofia: {
-        name: "Sofia", src: "processed/Sofia.png", tier: "sig",
-        specs: { Height: "5'9\"", Ethnicity: "Mixed / Afro-Caribbean", Hair: "Dark brown natural curl", Eyes: "Brown", Build: "Athletic lean" },
-        tags: ["Streetwear", "Outerwear", "Lifestyle", "Editorial"],
-        priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
-      },
-      felix: {
-        name: "Felix", src: "processed/Felix.png", tier: "stock",
-        specs: { Height: "6'1\"", Ethnicity: "White / Northern European", Hair: "Bleached blonde close crop", Eyes: "Blue-grey", Build: "Lean broad shoulder" },
-        tags: ["Streetwear", "Outerwear", "Accessories", "Menswear"],
-        priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
-      },
-      yuna: {
-        name: "Yuna", src: "processed/Yuna.png", tier: "sig",
-        specs: { Height: "5'6\"", Ethnicity: "East Asian", Hair: "Black blunt bob", Eyes: "Dark brown", Build: "Slim narrow frame" },
+      aoki: {
+        name: "Aoki", src: "processed/Aoki.png", tier: "sig",
+        specs: { Height: "5'7\"", Ethnicity: "East Asian", Hair: "Black blunt bob", Eyes: "Dark brown", Build: "Slim narrow frame" },
         tags: ["Streetwear", "Basics", "Accessories", "Japanese-lean editorial"],
         priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
       },
-      valentina: {
-        name: "Valentina", src: "processed/Valentina.png", tier: "stock",
-        specs: { Height: "5'8\"", Ethnicity: "South Asian", Hair: "Dark brown short textured", Eyes: "Dark brown", Build: "Slim angular" },
+      eli: {
+        name: "Eli", src: "processed/Eli.png", tier: "stock",
+        specs: { Height: "6'0\"", Ethnicity: "Mixed heritage", Hair: "Short fade", Eyes: "Dark brown", Build: "Athletic natural" },
+        tags: ["Streetwear", "Outerwear", "Accessories", "Menswear"],
+        priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
+      },
+      hana: {
+        name: "Hana", src: "processed/Hana.png", tier: "sig",
+        specs: { Height: "5'6\"", Ethnicity: "East Asian", Hair: "Blunt bob", Eyes: "Dark brown", Build: "Slim precise" },
+        tags: ["High fashion", "Editorial", "Contemporary", "Japanese brands"],
+        priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
+      },
+      nadia: {
+        name: "Nadia", src: "processed/Nadia.png", tier: "sig",
+        specs: { Height: "5'8\"", Ethnicity: "Italian/Algerian", Hair: "Dark brown", Eyes: "Dark brown", Build: "Tall lean" },
         tags: ["Elevated basics", "Outerwear", "Jewellery", "Lifestyle"],
+        priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
+      },
+      ade: {
+        name: "Ade", src: "processed/Ade.png", tier: "sig",
+        specs: { Height: "6'1\"", Ethnicity: "Black American", Hair: "Thick mature locs", Eyes: "Dark brown", Build: "Lean athletic" },
+        tags: ["High fashion", "Streetwear", "Editorial", "Campaign"],
+        priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
+      },
+      caspar: {
+        name: "Caspar", src: "processed/Caspar.png", tier: "stock",
+        specs: { Height: "6'2\"", Ethnicity: "Scandinavian", Hair: "Buzz cut dark brown", Eyes: "Blue-grey", Build: "Tall lean" },
+        tags: ["Technical outerwear", "Contemporary menswear", "Scandinavian brands", "Lifestyle"],
         priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
       }
     };
-    var ORDER = ["sofia", "felix", "yuna", "valentina"];
+    var ORDER = ["aoki", "eli", "hana", "nadia", "ade", "caspar"];
 
     function tierLabel(t) { return t === "sig" ? "Signature" : "Essential"; }
     function tierClass(t) { return t === "sig" ? "tier--sig" : "tier--stock"; }
@@ -366,7 +378,7 @@
       var buttons = toggle.querySelectorAll("button");
       var saved = null;
       try { saved = localStorage.getItem("rosterCols"); } catch (e) {}
-      if (saved === "1" || saved === "2" || saved === "4") setCols(saved);
+      if (saved === "1" || saved === "2" || saved === "3") setCols(saved);
 
       function setCols(n) {
         grid.style.setProperty("--cols", n);

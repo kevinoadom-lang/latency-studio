@@ -286,7 +286,7 @@
   }
 
   /* Roster grid */
-  .roster-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; }
+  .roster-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
   .card-fig { display: flex; flex-direction: column; align-items: center; }
   .card-fig .ph { position: relative; width: 100%; aspect-ratio: 3/4; overflow: hidden; background: #f3f3f3; }
   .card-fig .ph img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
@@ -483,16 +483,29 @@
 
   /* Signature — heavier border + dark banner */
   .price-card--signature { border: 1.5px solid var(--ink); }
-  .price-card--signature .pc-banner { background: var(--ink); color: #fff; }
+  .price-card--signature .pc-banner {
+  background: linear-gradient(135deg, #e8e8e8 0%, #f5f5f5 40%, #c8c8c8 100%);
+  color: #333;
+  font-weight: 500;
+}
 
-  .price-card--campaign { 
-  background: var(--bg); 
-  border: 0.5px solid var(--line); 
-  border-top: 4px solid var(--ink);
+  .price-card--campaign {
+  background: var(--bg);
+  border: 1px solid #888888;
+  border-top: none;
 }
 .price-card--campaign .pc-banner {
-  background: var(--ink);
-  color: #fff;
+  background: linear-gradient(135deg, 
+    #0a0a0a 0%, 
+    #1a1a1a 25%, 
+    #3a3a3a 40%, 
+    #888888 50%, 
+    #3a3a3a 60%, 
+    #1a1a1a 75%, 
+    #0a0a0a 100%);
+  color: #E8E8E8;
+  letter-spacing: 0.18em;
+  font-weight: 400;
 }
 .price-card--campaign h3 { color: var(--ink); }
 .price-card--campaign .pc-desc { color: var(--muted); }
@@ -548,7 +561,10 @@
     }
 
     .steps { grid-template-columns: 1fr; gap: 30px; }
-    .price-grid { grid-template-columns: 1fr; }
+    .price-grid {
+  padding: 0 20px;
+  grid-template-columns: 1fr;
+}
   }
 </style>
 </head>
@@ -641,26 +657,57 @@
   <div class="wrap">
     <span class="eyebrow label">How it works</span>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;margin-top:64px;">
+    <!-- Transformation visual: four products → one styled look -->
+    <div class="how-transform">
 
-      <!-- Left: transformation visual -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:center;">
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="aspect-ratio:3/4;overflow:hidden;border-radius:8px;background:#f3f3f3;">
-            <img src="yuna-our-legacy-hoodie.webp" alt="Product input" style="width:100%;height:100%;object-fit:cover;object-position:center;" />
-          </div>
-          <span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);">You send this</span>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="aspect-ratio:3/4;overflow:hidden;border-radius:8px;background:#f3f3f3;">
-            <img src="processed/Yuna.png" alt="Finished e-comm shot" style="width:100%;height:100%;object-fit:cover;object-position:center top;" />
-          </div>
-          <span style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--muted);">We deliver this</span>
+      <!-- Left: four product flat-lays -->
+      <div class="how-side">
+        <p class="how-head">You send this</p>
+        <div class="how-products">
+          <figure class="how-product">
+            <button class="how-product__img" type="button" aria-pressed="false" aria-label="Reveal Sacai jacket on the model">
+              <img src="sacai-jacket.webp" alt="Sacai jacket" />
+              <span class="how-zone" style="--zoom:340%; --posx:50%; --posy:18%;" aria-hidden="true"></span>
+            </button>
+            <figcaption class="how-product__label">Sacai Jacket</figcaption>
+          </figure>
+          <figure class="how-product">
+            <button class="how-product__img" type="button" aria-pressed="false" aria-label="Reveal Issey top on the model">
+              <img src="issey-top.webp" alt="Issey top" />
+              <span class="how-zone" style="--zoom:340%; --posx:50%; --posy:30%;" aria-hidden="true"></span>
+            </button>
+            <figcaption class="how-product__label">Issey Top</figcaption>
+          </figure>
+          <figure class="how-product">
+            <button class="how-product__img" type="button" aria-pressed="false" aria-label="Reveal Issey pants on the model">
+              <img src="issey-pants.webp" alt="Issey pants" />
+              <span class="how-zone" style="--zoom:340%; --posx:50%; --posy:62%;" aria-hidden="true"></span>
+            </button>
+            <figcaption class="how-product__label">Issey Pants</figcaption>
+          </figure>
+          <figure class="how-product">
+            <button class="how-product__img" type="button" aria-pressed="false" aria-label="Reveal Margiela Tabis on the model">
+              <img src="margiela-tabis.webp" alt="Margiela Tabis" />
+              <span class="how-zone" style="--zoom:340%; --posx:50%; --posy:100%;" aria-hidden="true"></span>
+            </button>
+            <figcaption class="how-product__label">Margiela Tabis</figcaption>
+          </figure>
         </div>
       </div>
 
-      <!-- Right: steps -->
-      <div style="display:flex;flex-direction:column;gap:48px;">
+      <!-- Centre: arrow -->
+      <div class="how-arrow" aria-hidden="true">&rarr;</div>
+
+      <!-- Right: Hana in the complete look -->
+      <div class="how-side">
+        <p class="how-head">We deliver this</p>
+        <div class="how-deliver__img"><img src="Hana.png" alt="Hana styled in the complete look" /></div>
+      </div>
+
+    </div>
+
+    <!-- Steps -->
+    <div class="how-steps" style="display:flex;flex-direction:column;gap:48px;">
         <div style="display:flex;gap:24px;align-items:flex-start;">
           <span style="font-size:64px;font-weight:800;line-height:1;color:rgba(0,0,0,0.06);flex-shrink:0;margin-top:-8px;">01</span>
           <div>
@@ -689,15 +736,102 @@
     </div>
   </div>
 
-  <!-- Mobile styles -->
+  <!-- How it works — transformation visual styles -->
   <style>
+    .how-transform {
+      --tile: #f1f2f1;            /* sampled from Hana's actual frame background */
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 44px;
+      align-items: stretch;
+      margin: 72px 0 96px;
+    }
+    .how-side { display: flex; flex-direction: column; }
+    .how-head {
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 22px;
+    }
+    .how-products { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .how-product { margin: 0; display: flex; flex-direction: column; gap: 10px; }
+    .how-product__img {
+      position: relative; width: 100%;
+      aspect-ratio: 1 / 1; background-color: var(--tile); overflow: hidden;
+      border: 1px solid var(--line); border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      padding: 12%;
+      cursor: pointer; appearance: none; -webkit-appearance: none; font: inherit; color: inherit;
+      /* Reticle grid — echoes the hero lens (quarter divisions + centre crosshair) */
+      background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'%20preserveAspectRatio='none'%3E%3Cg%20fill='none'%20stroke='%23000000'%3E%3Cg%20stroke-opacity='0.05'%20stroke-width='0.4'%3E%3Cline%20x1='25'%20y1='0'%20x2='25'%20y2='100'/%3E%3Cline%20x1='50'%20y1='0'%20x2='50'%20y2='100'/%3E%3Cline%20x1='75'%20y1='0'%20x2='75'%20y2='100'/%3E%3Cline%20x1='0'%20y1='25'%20x2='100'%20y2='25'/%3E%3Cline%20x1='0'%20y1='50'%20x2='100'%20y2='50'/%3E%3Cline%20x1='0'%20y1='75'%20x2='100'%20y2='75'/%3E%3C/g%3E%3Cg%20stroke-opacity='0.16'%20stroke-width='0.6'%3E%3Cline%20x1='44'%20y1='50'%20x2='56'%20y2='50'/%3E%3Cline%20x1='50'%20y1='44'%20x2='50'%20y2='56'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      background-size: 100% 100%; background-repeat: no-repeat;
+    }
+    .how-product__img img {
+      position: relative; z-index: 1;
+      width: 100%; height: 100%; object-fit: contain; display: block;
+      transition: opacity .18s ease;
+    }
+    /* Hover/tap reveal: a live CSS window into the single delivered Hana image.
+       Same file every card — only --zoom / --posx / --posy differ per zone. */
+    .how-zone {
+      position: absolute; inset: 0; z-index: 2;
+      border-radius: inherit;
+      background-color: var(--tile);   /* clean tile behind the transparent cutout */
+      background-image: url("Hana.png");
+      background-repeat: no-repeat;
+      background-size: var(--zoom, 340%) auto;
+      background-position: var(--posx, 50%) var(--posy, 50%);
+      opacity: 0; transition: opacity .18s ease;
+      pointer-events: none;
+    }
+    .how-product__img:hover .how-zone,
+    .how-product__img:focus-visible .how-zone,
+    .how-product__img.is-on .how-zone { opacity: 1; }
+    .how-product__img:hover img,
+    .how-product__img:focus-visible img,
+    .how-product__img.is-on img { opacity: 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .how-zone, .how-product__img img { transition: none; }
+    }
+    .how-product__label {
+      margin: 0; font-size: 10px; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted); text-align: center;
+    }
+    .how-arrow {
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px; font-weight: 300; line-height: 1; color: var(--muted);
+    }
+    .how-deliver__img { aspect-ratio: 1 / 1; background-color: var(--tile); overflow: hidden; border-radius: 10px; }
+    .how-deliver__img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+
     @media (max-width: 760px) {
-      #how .wrap > div[style*="grid-template-columns:1fr 1fr"] {
-        grid-template-columns: 1fr !important;
-        gap: 48px !important;
+      .how-transform {
+        grid-template-columns: 1fr;
+        gap: 28px;
+        margin: 48px 0 64px;
       }
+      .how-arrow { transform: rotate(90deg); }
+      .how-deliver__img { aspect-ratio: 3 / 4; }
     }
   </style>
+
+  <!-- Tap-to-reveal (mobile) + click-to-lock (desktop): one zone open at a time -->
+  <script>
+    (function () {
+      var cards = document.querySelectorAll(".how-product__img");
+      cards.forEach(function (card) {
+        card.addEventListener("click", function () {
+          var on = card.classList.contains("is-on");
+          cards.forEach(function (c) {
+            c.classList.remove("is-on");
+            c.setAttribute("aria-pressed", "false");
+          });
+          if (!on) {
+            card.classList.add("is-on");
+            card.setAttribute("aria-pressed", "true");
+          }
+        });
+      });
+    })();
+  </script>
 </section>
 
   <!-- ===== Roster ===== -->
@@ -707,47 +841,11 @@
       <div class="roster-grid">
         <div class="card-fig" tabindex="0">
           <div class="ph">
-            <img src="processed/Sofia.png" alt="Sofia" />
+            <img src="processed/Aoki.png" alt="Aoki" />
             <div class="card-overlay">
-              <div class="ov-name">Sofia</div>
+              <div class="ov-name">Aoki</div>
               <dl class="ov-spec">
-                <div><dt>Height</dt><dd>5'9"</dd></div>
-                <div><dt>Ethnicity</dt><dd>Mixed / Afro-Caribbean</dd></div>
-                <div><dt>Hair</dt><dd>Dark brown natural curl</dd></div>
-                <div><dt>Eyes</dt><dd>Brown</dd></div>
-                <div><dt>Build</dt><dd>Athletic lean</dd></div>
-                <div><dt>Tier</dt><dd>Signature</dd></div>
-                <div><dt>Status</dt><dd>Available</dd></div>
-              </dl>
-            </div>
-          </div>
-          <div class="meta"><span class="nm">Sofia</span><span class="tier tier--sig">Signature</span></div>
-        </div>
-        <div class="card-fig" tabindex="0">
-          <div class="ph">
-            <img src="processed/Felix.png" alt="Felix" />
-            <div class="card-overlay">
-              <div class="ov-name">Felix</div>
-              <dl class="ov-spec">
-                <div><dt>Height</dt><dd>6'1"</dd></div>
-                <div><dt>Ethnicity</dt><dd>White / Northern European</dd></div>
-                <div><dt>Hair</dt><dd>Bleached blonde close crop</dd></div>
-                <div><dt>Eyes</dt><dd>Blue-grey</dd></div>
-                <div><dt>Build</dt><dd>Lean broad shoulder</dd></div>
-                <div><dt>Tier</dt><dd>Essential</dd></div>
-                <div><dt>Status</dt><dd>Available</dd></div>
-              </dl>
-            </div>
-          </div>
-          <div class="meta"><span class="nm">Felix</span><span class="tier tier--stock">Essential</span></div>
-        </div>
-        <div class="card-fig" tabindex="0">
-          <div class="ph">
-            <img src="processed/Yuna.png" alt="Yuna" />
-            <div class="card-overlay">
-              <div class="ov-name">Yuna</div>
-              <dl class="ov-spec">
-                <div><dt>Height</dt><dd>5'6"</dd></div>
+                <div><dt>Height</dt><dd>5'7"</dd></div>
                 <div><dt>Ethnicity</dt><dd>East Asian</dd></div>
                 <div><dt>Hair</dt><dd>Black blunt bob</dd></div>
                 <div><dt>Eyes</dt><dd>Dark brown</dd></div>
@@ -757,25 +855,97 @@
               </dl>
             </div>
           </div>
-          <div class="meta"><span class="nm">Yuna</span><span class="tier tier--sig">Signature</span></div>
+          <div class="meta"><span class="nm">Aoki</span><span class="tier tier--sig">Signature</span></div>
         </div>
         <div class="card-fig" tabindex="0">
           <div class="ph">
-            <img src="processed/Valentina.png" alt="Valentina" />
+            <img src="processed/Eli.png" alt="Eli" />
             <div class="card-overlay">
-              <div class="ov-name">Valentina</div>
+              <div class="ov-name">Eli</div>
               <dl class="ov-spec">
-                <div><dt>Height</dt><dd>5'8"</dd></div>
-                <div><dt>Ethnicity</dt><dd>South Asian</dd></div>
-                <div><dt>Hair</dt><dd>Dark brown short textured</dd></div>
+                <div><dt>Height</dt><dd>6'0"</dd></div>
+                <div><dt>Ethnicity</dt><dd>Mixed heritage</dd></div>
+                <div><dt>Hair</dt><dd>Short fade</dd></div>
                 <div><dt>Eyes</dt><dd>Dark brown</dd></div>
-                <div><dt>Build</dt><dd>Slim angular</dd></div>
+                <div><dt>Build</dt><dd>Athletic natural</dd></div>
                 <div><dt>Tier</dt><dd>Essential</dd></div>
                 <div><dt>Status</dt><dd>Available</dd></div>
               </dl>
             </div>
           </div>
-          <div class="meta"><span class="nm">Valentina</span><span class="tier tier--stock">Essential</span></div>
+          <div class="meta"><span class="nm">Eli</span><span class="tier tier--stock">Essential</span></div>
+        </div>
+        <div class="card-fig" tabindex="0">
+          <div class="ph">
+            <img src="processed/Hana.png" alt="Hana" />
+            <div class="card-overlay">
+              <div class="ov-name">Hana</div>
+              <dl class="ov-spec">
+                <div><dt>Height</dt><dd>5'6"</dd></div>
+                <div><dt>Ethnicity</dt><dd>East Asian</dd></div>
+                <div><dt>Hair</dt><dd>Blunt bob</dd></div>
+                <div><dt>Eyes</dt><dd>Dark brown</dd></div>
+                <div><dt>Build</dt><dd>Slim precise</dd></div>
+                <div><dt>Tier</dt><dd>Signature</dd></div>
+                <div><dt>Status</dt><dd>Available</dd></div>
+              </dl>
+            </div>
+          </div>
+          <div class="meta"><span class="nm">Hana</span><span class="tier tier--sig">Signature</span></div>
+        </div>
+        <div class="card-fig" tabindex="0">
+          <div class="ph">
+            <img src="processed/Nadia.png" alt="Nadia" />
+            <div class="card-overlay">
+              <div class="ov-name">Nadia</div>
+              <dl class="ov-spec">
+                <div><dt>Height</dt><dd>5'8"</dd></div>
+                <div><dt>Ethnicity</dt><dd>Italian/Algerian</dd></div>
+                <div><dt>Hair</dt><dd>Dark brown</dd></div>
+                <div><dt>Eyes</dt><dd>Dark brown</dd></div>
+                <div><dt>Build</dt><dd>Tall lean</dd></div>
+                <div><dt>Tier</dt><dd>Signature</dd></div>
+                <div><dt>Status</dt><dd>Available</dd></div>
+              </dl>
+            </div>
+          </div>
+          <div class="meta"><span class="nm">Nadia</span><span class="tier tier--sig">Signature</span></div>
+        </div>
+        <div class="card-fig" tabindex="0">
+          <div class="ph">
+            <img src="processed/Ade.png" alt="Ade" />
+            <div class="card-overlay">
+              <div class="ov-name">Ade</div>
+              <dl class="ov-spec">
+                <div><dt>Height</dt><dd>6'1"</dd></div>
+                <div><dt>Ethnicity</dt><dd>Black American</dd></div>
+                <div><dt>Hair</dt><dd>Thick mature locs</dd></div>
+                <div><dt>Eyes</dt><dd>Dark brown</dd></div>
+                <div><dt>Build</dt><dd>Lean athletic</dd></div>
+                <div><dt>Tier</dt><dd>Signature</dd></div>
+                <div><dt>Status</dt><dd>Available</dd></div>
+              </dl>
+            </div>
+          </div>
+          <div class="meta"><span class="nm">Ade</span><span class="tier tier--sig">Signature</span></div>
+        </div>
+        <div class="card-fig" tabindex="0">
+          <div class="ph">
+            <img src="processed/Caspar.png" alt="Caspar" />
+            <div class="card-overlay">
+              <div class="ov-name">Caspar</div>
+              <dl class="ov-spec">
+                <div><dt>Height</dt><dd>6'2"</dd></div>
+                <div><dt>Ethnicity</dt><dd>Scandinavian</dd></div>
+                <div><dt>Hair</dt><dd>Buzz cut dark brown</dd></div>
+                <div><dt>Eyes</dt><dd>Blue-grey</dd></div>
+                <div><dt>Build</dt><dd>Tall lean</dd></div>
+                <div><dt>Tier</dt><dd>Essential</dd></div>
+                <div><dt>Status</dt><dd>Available</dd></div>
+              </dl>
+            </div>
+          </div>
+          <div class="meta"><span class="nm">Caspar</span><span class="tier tier--stock">Essential</span></div>
         </div>
       </div>
 
@@ -1116,10 +1286,12 @@
   <script>
     (function () {
       const ROSTER = [
-        { name: "Sofia",     src: "processed/Sofia.png" },
-        { name: "Felix",     src: "processed/Felix.png" },
-        { name: "Yuna",      src: "processed/Yuna.png" },
-        { name: "Valentina", src: "processed/Valentina.png" },
+        { name: "Aoki",   src: "processed/Aoki.png" },
+        { name: "Eli",    src: "processed/Eli.png" },
+        { name: "Hana",   src: "processed/Hana.png" },
+        { name: "Nadia",  src: "processed/Nadia.png" },
+        { name: "Ade",    src: "processed/Ade.png" },
+        { name: "Caspar", src: "processed/Caspar.png" },
       ];
 
       const hero   = document.getElementById("hero");
