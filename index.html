@@ -25,7 +25,7 @@
     -webkit-font-smoothing: antialiased;
   }
   body { overflow-x: hidden; }
-  body.menu-open { overflow: hidden; }
+  body.menu-open, body.profile-open { overflow: hidden; }
   [id] { scroll-margin-top: 24px; }
 
   .hero {
@@ -287,7 +287,8 @@
 
   /* Roster grid */
   .roster-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
-  .card-fig { display: flex; flex-direction: column; align-items: center; }
+  .card-fig { display: flex; flex-direction: column; align-items: center; cursor: pointer; }
+  .card-fig:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
   .card-fig .ph { position: relative; width: 100%; aspect-ratio: 3/4; overflow: hidden; background: #f3f3f3; }
   .card-fig .ph img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
   .card-fig .meta { margin-top: 14px; display: flex; align-items: center; gap: 10px; }
@@ -701,7 +702,10 @@
       <!-- Right: Hana in the complete look -->
       <div class="how-side">
         <p class="how-head">We deliver this</p>
-        <div class="how-deliver__img"><img src="Hana.png" alt="Hana styled in the complete look" /></div>
+        <div class="how-deliver__img how-swivel" id="howSwivel">
+          <img id="howSwivelImg" src="processed/Hana%200%20Degree.png" alt="Hana styled in the complete look — drag to rotate" draggable="false" />
+          <span class="how-swivel__hint label">Drag to rotate</span>
+        </div>
       </div>
 
     </div>
@@ -801,6 +805,14 @@
     }
     .how-deliver__img { aspect-ratio: 1 / 1; background-color: var(--tile); overflow: hidden; border-radius: 10px; }
     .how-deliver__img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+    /* 4-frame drag-snap swivel */
+    .how-swivel { position: relative; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+    .how-swivel.is-grabbing { cursor: grabbing; }
+    .how-swivel img { pointer-events: none; -webkit-user-drag: none; }
+    .how-swivel__hint {
+      position: absolute; left: 0; right: 0; bottom: 12px; text-align: center;
+      color: var(--muted); opacity: 0.85; pointer-events: none;
+    }
 
     @media (max-width: 760px) {
       .how-transform {
@@ -832,6 +844,56 @@
       });
     })();
   </script>
+
+  <!-- "We deliver this" — 4-frame drag-snap swivel (270 → 315 → 45 → 90) -->
+  <script>
+    (function () {
+      var FRAMES = [
+        "processed/Hana%20270%20Degree.png",
+        "processed/Hana%20315%20Degree.png",
+        "processed/Hana%200%20Degree.png",
+        "processed/Hana%2045%20Degree.png",
+        "processed/Hana%2090%20Degree.png"
+      ];
+      var DEFAULT = 2;          // resting frame = front (0°)
+      var STEP = 55;            // px of horizontal drag per frame step
+      var el = document.getElementById("howSwivel");
+      var img = document.getElementById("howSwivelImg");
+      if (!el || !img) return;
+
+      // Preload all four frames.
+      FRAMES.forEach(function (src) { var p = new Image(); p.src = src; });
+
+      var index = DEFAULT, startIndex = DEFAULT, startX = 0, dragging = false;
+
+      function setIndex(i) {
+        i = Math.max(0, Math.min(FRAMES.length - 1, i));   // clamp, no wrap
+        if (i === index) return;
+        index = i;
+        img.src = FRAMES[i];
+      }
+
+      el.addEventListener("pointerdown", function (e) {
+        if (e.button != null && e.button !== 0) return;
+        dragging = true;
+        startX = e.clientX;
+        startIndex = index;
+        el.classList.add("is-grabbing");
+        if (el.setPointerCapture) { try { el.setPointerCapture(e.pointerId); } catch (err) {} }
+      });
+      el.addEventListener("pointermove", function (e) {
+        if (!dragging) return;
+        setIndex(startIndex + Math.round((e.clientX - startX) / STEP));
+      });
+      function end() {
+        if (!dragging) return;
+        dragging = false;
+        el.classList.remove("is-grabbing");
+      }
+      el.addEventListener("pointerup", end);
+      el.addEventListener("pointercancel", end);
+    })();
+  </script>
 </section>
 
   <!-- ===== Roster ===== -->
@@ -839,25 +901,25 @@
     <div class="wrap">
       <span class="eyebrow label">Roster</span>
       <div class="roster-grid">
-        <div class="card-fig" tabindex="0">
+        <div class="card-fig" tabindex="0" role="button" data-char="akol" aria-label="Preview Akol">
           <div class="ph">
-            <img src="processed/Aoki.png" alt="Aoki" />
+            <img src="processed/Akol.png" alt="Akol" />
             <div class="card-overlay">
-              <div class="ov-name">Aoki</div>
+              <div class="ov-name">Akol</div>
               <dl class="ov-spec">
-                <div><dt>Height</dt><dd>5'7"</dd></div>
-                <div><dt>Ethnicity</dt><dd>East Asian</dd></div>
-                <div><dt>Hair</dt><dd>Black blunt bob</dd></div>
+                <div><dt>Height</dt><dd>5'11"</dd></div>
+                <div><dt>Ethnicity</dt><dd>South Sudanese</dd></div>
+                <div><dt>Hair</dt><dd>Shaved</dd></div>
                 <div><dt>Eyes</dt><dd>Dark brown</dd></div>
-                <div><dt>Build</dt><dd>Slim narrow frame</dd></div>
+                <div><dt>Build</dt><dd>Tall lean angular</dd></div>
                 <div><dt>Tier</dt><dd>Signature</dd></div>
                 <div><dt>Status</dt><dd>Available</dd></div>
               </dl>
             </div>
           </div>
-          <div class="meta"><span class="nm">Aoki</span><span class="tier tier--sig">Signature</span></div>
+          <div class="meta"><span class="nm">Akol</span><span class="tier tier--sig">Signature</span></div>
         </div>
-        <div class="card-fig" tabindex="0">
+        <div class="card-fig" tabindex="0" role="button" data-char="eli" aria-label="Preview Eli">
           <div class="ph">
             <img src="processed/Eli.png" alt="Eli" />
             <div class="card-overlay">
@@ -875,7 +937,7 @@
           </div>
           <div class="meta"><span class="nm">Eli</span><span class="tier tier--stock">Essential</span></div>
         </div>
-        <div class="card-fig" tabindex="0">
+        <div class="card-fig" tabindex="0" role="button" data-char="hana" aria-label="Preview Hana">
           <div class="ph">
             <img src="processed/Hana.png" alt="Hana" />
             <div class="card-overlay">
@@ -893,7 +955,7 @@
           </div>
           <div class="meta"><span class="nm">Hana</span><span class="tier tier--sig">Signature</span></div>
         </div>
-        <div class="card-fig" tabindex="0">
+        <div class="card-fig" tabindex="0" role="button" data-char="nadia" aria-label="Preview Nadia">
           <div class="ph">
             <img src="processed/Nadia.png" alt="Nadia" />
             <div class="card-overlay">
@@ -911,7 +973,7 @@
           </div>
           <div class="meta"><span class="nm">Nadia</span><span class="tier tier--sig">Signature</span></div>
         </div>
-        <div class="card-fig" tabindex="0">
+        <div class="card-fig" tabindex="0" role="button" data-char="ade" aria-label="Preview Ade">
           <div class="ph">
             <img src="processed/Ade.png" alt="Ade" />
             <div class="card-overlay">
@@ -929,7 +991,7 @@
           </div>
           <div class="meta"><span class="nm">Ade</span><span class="tier tier--sig">Signature</span></div>
         </div>
-        <div class="card-fig" tabindex="0">
+        <div class="card-fig" tabindex="0" role="button" data-char="caspar" aria-label="Preview Caspar">
           <div class="ph">
             <img src="processed/Caspar.png" alt="Caspar" />
             <div class="card-overlay">
@@ -1100,31 +1162,31 @@
       <span class="eyebrow label">Selected work</span>
       <div class="work-grid">
         <button class="work-item" type="button" data-project="0">
-          <img src="Selected%20Works%20-%20Sofia%20Timeless%20Cab.png" alt="Coming soon — with Sofia" style="object-position: center 40%;" />
+          <img src="selected-hana.png" alt="Coming soon — with Hana" style="object-position: center 20%;" />
           <span class="work-hover"></span>
           <span class="work-grad"></span>
-          <span class="work-meta"><span class="work-brand">Coming soon</span><span class="work-who">with Sofia</span></span>
+          <span class="work-meta"><span class="work-brand">Coming soon</span><span class="work-who">with Hana</span></span>
           <span class="work-cta">View collection</span>
         </button>
         <button class="work-item" type="button" data-project="1">
-          <img src="Selected%20Works%20-%20Felix%20Street%20Crossing.png" alt="Coming soon — with Felix" style="object-position: center 10%;" />
+          <img src="selected-nadia.png" alt="Coming soon — with Nadia" style="object-position: center 20%;" />
           <span class="work-hover"></span>
           <span class="work-grad"></span>
-          <span class="work-meta"><span class="work-brand">Coming soon</span><span class="work-who">with Felix</span></span>
+          <span class="work-meta"><span class="work-brand">Coming soon</span><span class="work-who">with Nadia</span></span>
           <span class="work-cta">View collection</span>
         </button>
         <button class="work-item" type="button" data-project="2">
-          <img src="Selected%20Works%20-%20Eleanor%20Doorbell.png" alt="Coming soon — with Yuna" />
+          <img src="selected-aoki.png" alt="Coming soon — with Akol" style="object-position: center 20%;" />
           <span class="work-hover"></span>
           <span class="work-grad"></span>
-          <span class="work-meta"><span class="work-brand">Coming soon</span><span class="work-who">with Yuna</span></span>
+          <span class="work-meta"><span class="work-brand">Coming soon</span><span class="work-who">with Akol</span></span>
           <span class="work-cta">View collection</span>
         </button>
         <button class="work-item" type="button" data-project="3">
-          <img src="Selected%20Works%20-%20Valentina%20Interior.png" alt="Coming soon — with Valentina" />
+          <img src="selected-eli.png" alt="Coming soon — with Eli" style="object-position: center 20%;" />
           <span class="work-hover"></span>
           <span class="work-grad"></span>
-          <span class="work-meta"><span class="work-brand">Coming soon</span><span class="work-who">with Valentina</span></span>
+          <span class="work-meta"><span class="work-brand">Coming soon</span><span class="work-who">with Eli</span></span>
           <span class="work-cta">View collection</span>
         </button>
       </div>
@@ -1211,10 +1273,10 @@
     /* ===== Lightbox ===== */
     (function () {
       const PROJECTS = [
-        { brand: "Coming soon", who: "with Sofia",     images: ["Selected Works - Sofia Timeless Cab.png"] },
-        { brand: "Coming soon",       who: "with Felix",     images: ["Selected Works - Felix Street Crossing.png"] },
-        { brand: "Coming soon",      who: "with Yuna",      images: ["Selected Works - Eleanor Doorbell.png"] },
-        { brand: "Coming soon",        who: "with Valentina", images: ["Selected Works - Valentina Interior.png"] },
+        { brand: "Coming soon", who: "with Hana",  images: ["selected-hana.png"] },
+        { brand: "Coming soon", who: "with Nadia", images: ["selected-nadia.png"] },
+        { brand: "Coming soon", who: "with Akol",  images: ["selected-aoki.png"] },
+        { brand: "Coming soon", who: "with Eli",   images: ["selected-eli.png"] },
       ];
 
       const lb       = document.getElementById("lightbox");
@@ -1286,7 +1348,7 @@
   <script>
     (function () {
       const ROSTER = [
-        { name: "Aoki",   src: "processed/Aoki.png" },
+        { name: "Akol",   src: "processed/Akol.png" },
         { name: "Eli",    src: "processed/Eli.png" },
         { name: "Hana",   src: "processed/Hana.png" },
         { name: "Nadia",  src: "processed/Nadia.png" },
@@ -1541,5 +1603,107 @@
       document.addEventListener("keydown", (e) => { if (e.key === "Escape") setOpen(false); });
     })();
   </script>
+  <!-- ===== Model preview interstitial (shared with roster.html) ===== -->
+  <style>
+    .profile {
+      position: fixed; inset: 0; z-index: 120; background: var(--bg);
+      opacity: 0; visibility: hidden; transform: translateY(18px);
+      transition: opacity .3s ease, transform .3s ease, visibility .3s ease;
+    }
+    .profile.open { opacity: 1; visibility: visible; transform: translateY(0); }
+    .profile__close {
+      position: absolute; top: 16px; right: 18px; z-index: 3;
+      width: 46px; height: 46px; border: 0; background: none;
+      font-size: 30px; line-height: 1; color: var(--ink); cursor: pointer;
+    }
+    .profile__inner { display: flex; height: 100%; }
+    .profile__img { position: relative; flex: 0 0 50%; background: #f1f1f1; overflow: hidden; }
+    .profile__img img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
+    /* Outfit ↔ headshot carousel (shared with the roster cards) */
+    .carousel { position: absolute; inset: 0; overflow: hidden; touch-action: pan-y; z-index: 1; }
+    .carousel__track { display: flex; width: 200%; height: 100%; transform: translateX(0); transition: transform 0.3s ease; will-change: transform; }
+    .carousel__track.is-dragging { transition: none; }
+    .carousel__slide { flex: 0 0 50%; width: 50%; height: 100%; }
+    .carousel__slide img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; -webkit-user-drag: none; user-select: none; }
+    .carousel__dots {
+      position: absolute; left: 50%; transform: translateX(-50%); bottom: 12px; z-index: 4;
+      display: flex; align-items: center; gap: 7px; padding: 6px 9px; border-radius: 999px;
+      background: rgba(255,255,255,0.6); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+    }
+    .carousel__dot { width: 6px; height: 6px; padding: 0; border: 0; border-radius: 50%; background: rgba(0,0,0,0.28); cursor: pointer; transition: background 0.15s ease; }
+    .carousel__dot.is-active { background: var(--ink); }
+    @media (prefers-reduced-motion: reduce) { .carousel__track { transition: none; } }
+    .profile__panel {
+      flex: 1 1 50%; overflow-y: auto;
+      padding: clamp(32px, 5vw, 76px); padding-bottom: 48px;
+      display: flex; flex-direction: column; gap: 26px;
+    }
+    .pf-name { font-size: clamp(34px, 5vw, 56px); font-weight: 800; letter-spacing: -0.02em; margin: 0; }
+    .pf-tier-row { margin-top: -12px; }
+    .pf-spec { max-width: 400px; }
+    .pf-label { font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; }
+    .pf-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .pf-tag { font-size: 11px; letter-spacing: 0.03em; padding: 7px 13px; border-radius: 999px; border: 0.5px solid var(--line); color: var(--ink); }
+    .pf-pricing { display: grid; gap: 8px; max-width: 400px; }
+    .pf-price-row { display: flex; justify-content: space-between; gap: 16px; font-size: 14px; padding-bottom: 8px; border-bottom: 1px solid var(--line); }
+    .pf-price-row span:first-child { color: var(--muted); }
+    .pf-price-row span:last-child { color: var(--ink); font-weight: 500; }
+    .pf-avail { font-size: 13px; letter-spacing: 0.04em; display: inline-flex; align-items: center; gap: 9px; }
+    .pf-avail::before { content: ""; width: 8px; height: 8px; border-radius: 50%; flex: 0 0 auto; }
+    .pf-avail.is-available { color: #1a7f37; }
+    .pf-avail.is-available::before { background: #1a7f37; }
+    .pf-avail.is-booked { color: var(--muted); }
+    .pf-avail.is-booked::before { background: #c98a00; }
+    .pf-book {
+      margin-top: auto; display: inline-block; text-align: center;
+      padding: 15px 22px; border-radius: 999px; background: var(--ink);
+      color: #fff; text-decoration: none; font-size: 13px; letter-spacing: 0.06em;
+    }
+    .pf-book:hover { opacity: 0.88; }
+    @media (prefers-reduced-motion: reduce) {
+      .profile { transition: opacity .2s ease, visibility .2s ease; transform: none; }
+    }
+    @media (max-width: 760px) {
+      .profile__inner { flex-direction: column; height: 100%; overflow-y: auto; }
+      .profile__img { flex: 0 0 auto; height: 56vh; }
+      .profile__panel { flex: 1 1 auto; overflow: visible; padding: 30px 24px calc(40px + env(safe-area-inset-bottom)); }
+    }
+  </style>
+
+  <div class="profile" id="profile" role="dialog" aria-modal="true" aria-label="Model profile" aria-hidden="true">
+    <button class="profile__close" id="profileClose" type="button" aria-label="Close profile">&times;</button>
+    <div class="profile__inner">
+      <div class="profile__img">
+        <div class="carousel" id="pfCarousel">
+          <div class="carousel__track">
+            <div class="carousel__slide"><img id="pfImg" src="" alt="" /></div>
+            <div class="carousel__slide"><img id="pfImgHead" src="" alt="" /></div>
+          </div>
+        </div>
+        <div class="carousel__dots" id="pfDots">
+          <button type="button" class="carousel__dot is-active" data-slide="0" aria-label="Show outfit"></button>
+          <button type="button" class="carousel__dot" data-slide="1" aria-label="Show headshot"></button>
+        </div>
+      </div>
+      <div class="profile__panel">
+        <h2 class="pf-name" id="pfName"></h2>
+        <div class="pf-tier-row"><span class="tier" id="pfTier"></span></div>
+        <dl class="ov-spec pf-spec" id="pfSpec"></dl>
+        <div>
+          <div class="pf-label">Frequently booked for</div>
+          <div class="pf-tags" id="pfTags"></div>
+        </div>
+        <div>
+          <div class="pf-label">Pricing</div>
+          <div class="pf-pricing" id="pfPricing"></div>
+        </div>
+        <div class="pf-avail" id="pfAvail"></div>
+        <a class="pf-book" id="pfBook" href="#book">Book →</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="roster-shared.js"></script>
 </body>
 </html>

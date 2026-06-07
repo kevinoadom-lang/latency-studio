@@ -121,6 +121,22 @@
   .card-fig .ph { position: relative; width: 100%; aspect-ratio: 3/4; overflow: hidden; background: #f3f3f3; }
   .card-fig .ph img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
 
+  /* Outfit ↔ headshot carousel (2 horizontal slides) */
+  .carousel { position: absolute; inset: 0; overflow: hidden; touch-action: pan-y; z-index: 1; }
+  .carousel__track { display: flex; width: 200%; height: 100%; transform: translateX(0); transition: transform 0.3s ease; will-change: transform; }
+  .carousel__track.is-dragging { transition: none; }
+  .carousel__slide { flex: 0 0 50%; width: 50%; height: 100%; }
+  .carousel__slide img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; -webkit-user-drag: none; user-select: none; }
+  .carousel__dots {
+    position: absolute; left: 50%; transform: translateX(-50%); bottom: 10px; z-index: 4;
+    display: flex; align-items: center; gap: 7px; padding: 6px 9px; border-radius: 999px;
+    background: rgba(255,255,255,0.6); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.10);
+  }
+  .carousel__dot { width: 6px; height: 6px; padding: 0; border: 0; border-radius: 50%; background: rgba(0,0,0,0.28); cursor: pointer; transition: background 0.15s ease; }
+  .carousel__dot.is-active { background: var(--ink); }
+  @media (prefers-reduced-motion: reduce) { .carousel__track { transition: none; } }
+
   .rp-card .meta { display: flex; align-items: center; gap: 10px; }
   .rp-card .nm { font-weight: 600; }
 
@@ -136,7 +152,7 @@
 
   /* Hover overlay — frosted model card */
   .card-overlay {
-    position: absolute; inset: 0;
+    position: absolute; inset: 0; z-index: 2; pointer-events: none;
     background: rgba(255,255,255,0.75);
     -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
     display: flex; flex-direction: column; justify-content: center;
@@ -163,7 +179,7 @@
     font-size: 30px; line-height: 1; color: var(--ink); cursor: pointer;
   }
   .profile__inner { display: flex; height: 100%; }
-  .profile__img { flex: 0 0 50%; background: #f1f1f1; overflow: hidden; }
+  .profile__img { position: relative; flex: 0 0 50%; background: #f1f1f1; overflow: hidden; }
   .profile__img img { width: 100%; height: 100%; object-fit: cover; object-position: center top; display: block; }
   .profile__panel {
     flex: 1 1 50%; overflow-y: auto;
@@ -271,7 +287,18 @@
   <div class="profile" id="profile" role="dialog" aria-modal="true" aria-label="Model profile" aria-hidden="true">
     <button class="profile__close" id="profileClose" type="button" aria-label="Close profile">&times;</button>
     <div class="profile__inner">
-      <div class="profile__img"><img id="pfImg" src="" alt="" /></div>
+      <div class="profile__img">
+        <div class="carousel" id="pfCarousel">
+          <div class="carousel__track">
+            <div class="carousel__slide"><img id="pfImg" src="" alt="" /></div>
+            <div class="carousel__slide"><img id="pfImgHead" src="" alt="" /></div>
+          </div>
+        </div>
+        <div class="carousel__dots" id="pfDots">
+          <button type="button" class="carousel__dot is-active" data-slide="0" aria-label="Show outfit"></button>
+          <button type="button" class="carousel__dot" data-slide="1" aria-label="Show headshot"></button>
+        </div>
+      </div>
       <div class="profile__panel">
         <h2 class="pf-name" id="pfName"></h2>
         <div class="pf-tier-row"><span class="tier" id="pfTier"></span></div>
@@ -290,57 +317,63 @@
     </div>
   </div>
 
+  <script src="roster-shared.js"></script>
   <script>
-    /* ===== Character data ===== */
-    var CHARACTERS = {
-      aoki: {
-        name: "Aoki", src: "processed/Aoki.png", tier: "sig",
-        specs: { Height: "5'7\"", Ethnicity: "East Asian", Hair: "Black blunt bob", Eyes: "Dark brown", Build: "Slim narrow frame" },
-        tags: ["Streetwear", "Basics", "Accessories", "Japanese-lean editorial"],
-        priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
-      },
-      eli: {
-        name: "Eli", src: "processed/Eli.png", tier: "stock",
-        specs: { Height: "6'0\"", Ethnicity: "Mixed heritage", Hair: "Short fade", Eyes: "Dark brown", Build: "Athletic natural" },
-        tags: ["Streetwear", "Outerwear", "Accessories", "Menswear"],
-        priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
-      },
-      hana: {
-        name: "Hana", src: "processed/Hana.png", tier: "sig",
-        specs: { Height: "5'6\"", Ethnicity: "East Asian", Hair: "Blunt bob", Eyes: "Dark brown", Build: "Slim precise" },
-        tags: ["High fashion", "Editorial", "Contemporary", "Japanese brands"],
-        priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
-      },
-      nadia: {
-        name: "Nadia", src: "processed/Nadia.png", tier: "sig",
-        specs: { Height: "5'8\"", Ethnicity: "Italian/Algerian", Hair: "Dark brown", Eyes: "Dark brown", Build: "Tall lean" },
-        tags: ["Elevated basics", "Outerwear", "Jewellery", "Lifestyle"],
-        priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
-      },
-      ade: {
-        name: "Ade", src: "processed/Ade.png", tier: "sig",
-        specs: { Height: "6'1\"", Ethnicity: "Black American", Hair: "Thick mature locs", Eyes: "Dark brown", Build: "Lean athletic" },
-        tags: ["High fashion", "Streetwear", "Editorial", "Campaign"],
-        priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
-      },
-      caspar: {
-        name: "Caspar", src: "processed/Caspar.png", tier: "stock",
-        specs: { Height: "6'2\"", Ethnicity: "Scandinavian", Hair: "Buzz cut dark brown", Eyes: "Blue-grey", Build: "Tall lean" },
-        tags: ["Technical outerwear", "Contemporary menswear", "Scandinavian brands", "Lifestyle"],
-        priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
-      }
-    };
-    var ORDER = ["aoki", "eli", "hana", "nadia", "ade", "caspar"];
+    /* Character data, helpers (tierLabel / tierClass / specRows) and the
+       model-preview interstitial now live in roster-shared.js (shared with
+       index.html). They are exposed as globals and used below. */
 
-    function tierLabel(t) { return t === "sig" ? "Signature" : "Essential"; }
-    function tierClass(t) { return t === "sig" ? "tier--sig" : "tier--stock"; }
+    /* ===== Outfit ↔ headshot carousel (2 slides: swipe / click-drag) ===== */
+    function initCarousels(scope) {
+      var list = (scope || document).querySelectorAll(".carousel");
+      list.forEach(function (car) {
+        var track = car.querySelector(".carousel__track");
+        var dots = car.parentNode.querySelectorAll(".carousel__dot");
+        var idx = 0, startX = 0, width = 1, dragging = false;
 
-    function specRows(specs) {
-      var html = "";
-      for (var k in specs) { if (specs.hasOwnProperty(k)) {
-        html += "<div><dt>" + k + "</dt><dd>" + specs[k] + "</dd></div>";
-      }}
-      return html;
+        function setIndex(i) {
+          idx = Math.max(0, Math.min(1, i));
+          track.style.transform = "translateX(" + (-idx * 50) + "%)";
+          dots.forEach(function (d, di) { d.classList.toggle("is-active", di === idx); });
+        }
+
+        car.addEventListener("pointerdown", function (e) {
+          if (e.button != null && e.button !== 0) return;
+          if (e.target.closest(".carousel__dot")) return;   // let dots handle themselves
+          dragging = true;
+          width = car.clientWidth || 1;
+          startX = e.clientX;
+          track.classList.add("is-dragging");
+          if (car.setPointerCapture) { try { car.setPointerCapture(e.pointerId); } catch (err) {} }
+        });
+        car.addEventListener("pointermove", function (e) {
+          if (!dragging) return;
+          var pct = (-idx * 50) + ((e.clientX - startX) / width) * 50;
+          pct = Math.max(-50, Math.min(0, pct));            // clamp within the two ends
+          track.style.transform = "translateX(" + pct + "%)";
+        });
+        function end(e) {
+          if (!dragging) return;
+          dragging = false;
+          track.classList.remove("is-dragging");
+          var dx = e.clientX - startX, t = width * 0.25, next = idx;
+          if (dx <= -t) next = 1; else if (dx >= t) next = 0;   // snap past ~25% drag
+          setIndex(next);
+        }
+        car.addEventListener("pointerup", end);
+        car.addEventListener("pointercancel", function () {
+          if (!dragging) return;
+          dragging = false; track.classList.remove("is-dragging"); setIndex(idx);
+        });
+        dots.forEach(function (d) {
+          d.addEventListener("click", function (e) {
+            e.stopPropagation();
+            setIndex(parseInt(d.getAttribute("data-slide"), 10));
+          });
+        });
+
+        setIndex(0);
+      });
     }
 
     /* ===== Build the grid ===== */
@@ -353,13 +386,22 @@
           '<article class="rp-card">' +
             '<div class="card-fig" tabindex="0">' +
               '<div class="ph">' +
-                '<img src="' + c.src + '" alt="' + c.name + '" />' +
+                '<div class="carousel">' +
+                  '<div class="carousel__track">' +
+                    '<div class="carousel__slide"><img src="' + c.src + '" alt="' + c.name + '" /></div>' +
+                    '<div class="carousel__slide"><img src="' + c.headshot + '" alt="' + c.name + ' headshot" /></div>' +
+                  '</div>' +
+                '</div>' +
                 '<div class="card-overlay">' +
                   '<div class="ov-name">' + c.name + '</div>' +
                   '<dl class="ov-spec">' + specRows(c.specs) +
                     '<div><dt>Tier</dt><dd>' + tierLabel(c.tier) + '</dd></div>' +
                     '<div><dt>Status</dt><dd>' + (c.tier === "sig" ? "1 slot open" : "Available") + '</dd></div>' +
                   '</dl>' +
+                '</div>' +
+                '<div class="carousel__dots">' +
+                  '<button type="button" class="carousel__dot is-active" data-slide="0" aria-label="Show outfit"></button>' +
+                  '<button type="button" class="carousel__dot" data-slide="1" aria-label="Show headshot"></button>' +
                 '</div>' +
               '</div>' +
             '</div>' +
@@ -369,6 +411,7 @@
           '</article>';
       });
       grid.innerHTML = html;
+      initCarousels(grid);
     })();
 
     /* ===== Column toggle (persists on the page + across visits) ===== */
@@ -390,66 +433,9 @@
       });
     })();
 
-    /* ===== Profile interstitial ===== */
-    (function () {
-      var profile = document.getElementById("profile");
-      var pfImg = document.getElementById("pfImg");
-      var pfName = document.getElementById("pfName");
-      var pfTier = document.getElementById("pfTier");
-      var pfSpec = document.getElementById("pfSpec");
-      var pfTags = document.getElementById("pfTags");
-      var pfPricing = document.getElementById("pfPricing");
-      var pfAvail = document.getElementById("pfAvail");
-      var pfBook = document.getElementById("pfBook");
-      var pfClose = document.getElementById("profileClose");
-      var lastFocus = null;
-
-      function open(key) {
-        var c = CHARACTERS[key];
-        if (!c) return;
-        lastFocus = document.activeElement;
-        pfImg.src = c.src; pfImg.alt = c.name;
-        pfName.textContent = c.name;
-        pfTier.textContent = tierLabel(c.tier);
-        pfTier.className = "tier " + tierClass(c.tier);
-        pfSpec.innerHTML = specRows(c.specs);
-        pfTags.innerHTML = c.tags.map(function (t) { return '<span class="pf-tag">' + t + '</span>'; }).join("");
-        pfPricing.innerHTML =
-          '<div class="pf-price-row"><span>Essential</span><span>' + c.priceStock + '</span></div>' +
-          '<div class="pf-price-row"><span>Signature</span><span>' + c.priceSig + '</span></div>';
-        if (c.tier === "sig") {
-          pfAvail.className = "pf-avail is-booked";
-          pfAvail.textContent = "Booked — 1 slot open";
-        } else {
-          pfAvail.className = "pf-avail is-available";
-          pfAvail.textContent = "Available";
-        }
-        pfBook.textContent = "Book " + c.name + " →";
-        pfBook.href = "index.html#book";
-
-        profile.classList.add("open");
-        profile.setAttribute("aria-hidden", "false");
-        document.body.classList.add("profile-open");
-        pfClose.focus();
-      }
-
-      function close() {
-        profile.classList.remove("open");
-        profile.setAttribute("aria-hidden", "true");
-        document.body.classList.remove("profile-open");
-        if (lastFocus && lastFocus.focus) lastFocus.focus();
-      }
-
-      document.getElementById("rpGrid").addEventListener("click", function (e) {
-        var btn = e.target.closest(".rp-preview");
-        if (btn) open(btn.getAttribute("data-char"));
-      });
-      pfClose.addEventListener("click", close);
-      profile.addEventListener("click", function (e) { if (e.target === profile || e.target.classList.contains("profile__inner")) close(); });
-      document.addEventListener("keydown", function (e) {
-        if (e.key === "Escape" && profile.classList.contains("open")) close();
-      });
-    })();
+    /* The model-preview interstitial (open/close, rendering, per-model URL
+       routing via #model/<key>, and [data-char] click handling) is provided
+       by roster-shared.js — it binds to the #profile markup on this page. */
 
     /* ===== Announcement dismiss ===== */
     (function () {
