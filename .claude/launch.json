@@ -4,7 +4,7 @@
     {
       "name": "latency-hero",
       "runtimeExecutable": "python3",
-      "runtimeArgs": ["-m", "http.server", "4321"],
+      "runtimeArgs": ["/tmp/latency-preview/serve.py", "4321"],
       "port": 4321
     }
   ]
