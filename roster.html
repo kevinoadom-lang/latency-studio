@@ -168,15 +168,16 @@
   .card-info:hover ~ .card-overlay,
   .card-info:focus-visible ~ .card-overlay,
   .ph.specs-open .card-overlay { opacity: 1; }
+  /* "Details" chip — frosted pill, top-right of each card */
   .card-info {
     position: absolute; top: 9px; right: 9px; z-index: 5;
-    width: 30px; height: 30px; padding: 0; border: 0; background: none; cursor: pointer;
-    display: grid; place-items: center;
-    opacity: 0.7; mix-blend-mode: difference;   /* viewfinder reticle — legible on any tone, like the hero lens */
-    transition: opacity 0.2s ease, transform 0.25s ease;
+    padding: 5px 10px; border: 0; border-radius: 999px; cursor: pointer;
+    background: rgba(255,255,255,0.78); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-  .card-info svg { width: 24px; height: 24px; display: block; overflow: visible; }
-  .card-info:hover, .card-info:focus-visible, .card-info.is-open { opacity: 1; transform: scale(1.1); }
+  .card-info:hover, .card-info:focus-visible, .card-info.is-open { transform: scale(1.06); box-shadow: 0 2px 6px rgba(0,0,0,0.16); }
   .ov-name { font-weight: 600; font-size: 15px; letter-spacing: 0.04em; color: var(--ink); }
   .ov-spec { margin: 0; display: grid; gap: 7px; }
   .ov-spec > div { display: flex; justify-content: space-between; gap: 12px;
@@ -249,6 +250,24 @@
     .profile__panel { flex: 1 1 auto; overflow: visible; padding: 30px 24px calc(40px + env(safe-area-inset-bottom)); }
   }
 </style>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '427714368008362');
+fbq('track', 'PageView');
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
 </head>
 <body>
   <!-- ===== Announcement bar ===== -->
@@ -406,6 +425,11 @@
       });
     }
 
+    /* ===== Info affordance: "Details" chip ===== */
+    function infoIcon(name) {
+      return '<button type="button" class="card-info" aria-label="View ' + name + ' details">Details</button>';
+    }
+
     /* ===== Build the grid ===== */
     (function () {
       var grid = document.getElementById("rpGrid");
@@ -416,16 +440,7 @@
           '<article class="rp-card">' +
             '<div class="card-fig" tabindex="0">' +
               '<div class="ph">' +
-                '<button type="button" class="card-info" aria-label="View ' + c.name + ' details">' +
-                  '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' +
-                    '<g fill="none" stroke="#fff" stroke-width="1.1">' +
-                      '<circle cx="12" cy="12" r="9"/>' +
-                      '<line x1="12" y1="4.5" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="19.5"/>' +
-                      '<line x1="4.5" y1="12" x2="9" y2="12"/><line x1="15" y1="12" x2="19.5" y2="12"/>' +
-                    '</g>' +
-                    '<circle cx="12" cy="12" r="1.1" fill="#fff"/>' +
-                  '</svg>' +
-                '</button>' +
+                infoIcon(c.name) +
                 '<div class="carousel">' +
                   '<div class="carousel__track">' +
                     '<div class="carousel__slide"><img src="' + c.src + '" alt="' + c.name + '" /></div>' +
