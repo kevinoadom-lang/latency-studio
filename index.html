@@ -2119,6 +2119,15 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
           body: JSON.stringify(payload)
         }).then(function (res) {
           if (res.ok) {
+            if (window.fbq) {
+              fbq("track", "Lead", {
+                content_name: "Waitlist",
+                content_category: "waitlist",
+                model_interest: payload.model_interest,
+                use_case: payload.use_case,
+                stage: payload.stage
+              });
+            }
             form.hidden = true;
             setStatus("You're on the list. We'll be in touch.", true);
           } else {
@@ -2129,6 +2138,14 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
           setStatus("Something went wrong — email kevin.oadom@gmail.com.", false);
           btn.disabled = false; btn.textContent = label;
         });
+      });
+
+      // Funnel signal: fire once when the user first engages the waitlist form
+      var wlStarted = false;
+      form.addEventListener("focusin", function () {
+        if (wlStarted) return;
+        wlStarted = true;
+        if (window.fbq) fbq("trackCustom", "WaitlistStarted");
       });
     })();
   </script>

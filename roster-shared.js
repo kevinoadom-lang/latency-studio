@@ -155,6 +155,14 @@
       if (profile.classList.contains("open") && profile.getAttribute("data-key") === key) return;
       if (!profile.classList.contains("open")) lastFocus = document.activeElement;
       if (!render(key)) return;
+      if (window.fbq) {
+        fbq("track", "ViewContent", {
+          content_type: "model",
+          content_category: "model",
+          content_ids: [key],
+          content_name: CHARACTERS[key].name
+        });
+      }
       profile.setAttribute("data-key", key);
       profile.classList.add("open");
       profile.setAttribute("aria-hidden", "false");
