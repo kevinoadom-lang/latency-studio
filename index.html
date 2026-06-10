@@ -321,6 +321,16 @@
   }
   .card-fig:hover .card-overlay,
   .card-fig:focus-within .card-overlay { opacity: 1; }
+  /* "Details" chip — matches the roster page; the whole card opens the preview */
+  .card-info {
+    position: absolute; top: 9px; right: 9px; z-index: 5;
+    padding: 5px 10px; border: 0; border-radius: 999px; cursor: pointer;
+    background: rgba(255,255,255,0.78); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .card-fig:hover .card-info { transform: scale(1.06); box-shadow: 0 2px 6px rgba(0,0,0,0.16); }
   .ov-name { font-weight: 600; font-size: 15px; letter-spacing: 0.04em; color: var(--ink); }
   .ov-spec { margin: 0; display: grid; gap: 7px; }
   .ov-spec > div {
@@ -1063,6 +1073,7 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
       <div class="roster-grid">
         <div class="card-fig" tabindex="0" role="button" data-char="akol" aria-label="Preview Akol">
           <div class="ph">
+            <span class="card-info" aria-hidden="true">Details</span>
             <img src="processed/Akol.png" alt="Akol" />
             <div class="card-overlay">
               <div class="ov-name">Akol</div>
@@ -1081,6 +1092,7 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
         </div>
         <div class="card-fig" tabindex="0" role="button" data-char="eli" aria-label="Preview Eli">
           <div class="ph">
+            <span class="card-info" aria-hidden="true">Details</span>
             <img src="processed/Eli.png" alt="Eli" />
             <div class="card-overlay">
               <div class="ov-name">Eli</div>
@@ -1099,6 +1111,7 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
         </div>
         <div class="card-fig" tabindex="0" role="button" data-char="hana" aria-label="Preview Hana">
           <div class="ph">
+            <span class="card-info" aria-hidden="true">Details</span>
             <img src="processed/Hana.png" alt="Hana" />
             <div class="card-overlay">
               <div class="ov-name">Hana</div>
@@ -1117,6 +1130,7 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
         </div>
         <div class="card-fig" tabindex="0" role="button" data-char="nadia" aria-label="Preview Nadia">
           <div class="ph">
+            <span class="card-info" aria-hidden="true">Details</span>
             <img src="processed/Nadia.png" alt="Nadia" />
             <div class="card-overlay">
               <div class="ov-name">Nadia</div>
@@ -1135,6 +1149,7 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
         </div>
         <div class="card-fig" tabindex="0" role="button" data-char="ade" aria-label="Preview Ade">
           <div class="ph">
+            <span class="card-info" aria-hidden="true">Details</span>
             <img src="processed/Ade.png" alt="Ade" />
             <div class="card-overlay">
               <div class="ov-name">Ade</div>
@@ -1153,6 +1168,7 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
         </div>
         <div class="card-fig" tabindex="0" role="button" data-char="caspar" aria-label="Preview Caspar">
           <div class="ph">
+            <span class="card-info" aria-hidden="true">Details</span>
             <img src="processed/Caspar.png" alt="Caspar" />
             <div class="card-overlay">
               <div class="ov-name">Caspar</div>
