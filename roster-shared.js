@@ -234,3 +234,67 @@
     initProfile();
   }
 })();
+
+/* =========================================================================
+   Cookie consent — gates the Meta Pixel (and CAPI). Loaded on every page.
+   Default is "revoke" (set in the <head> snippet); the pixel only sends once
+   the visitor accepts. Choice persisted in localStorage ("ll_consent").
+   ========================================================================= */
+(function () {
+  "use strict";
+  var KEY = "ll_consent";
+  function read() { try { return localStorage.getItem(KEY); } catch (e) { return null; } }
+  function write(v) { try { localStorage.setItem(KEY, v); } catch (e) {} }
+
+  // Expose for the CAPI client (server-side events must respect consent too).
+  window.LL_consentGranted = function () { return read() === "granted"; };
+
+  var choice = read();
+  if (choice === "granted" || choice === "denied") return;  // already decided — no banner
+
+  var css = ""
+    + ".ll-consent{position:fixed;left:12px;right:12px;bottom:12px;z-index:9999;max-width:720px;margin:0 auto;"
+    + "display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:14px 16px;"
+    + "background:rgba(255,255,255,0.94);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);"
+    + "border:1px solid var(--line,rgba(0,0,0,0.12));border-radius:12px;box-shadow:0 6px 24px rgba(0,0,0,0.14);"
+    + "font-size:13px;color:var(--muted,#777);}"
+    + ".ll-consent p{margin:0;flex:1 1 240px;line-height:1.5;}"
+    + ".ll-consent__actions{display:flex;gap:8px;flex:0 0 auto;}"
+    + ".ll-consent button{font:inherit;font-size:12px;letter-spacing:0.04em;cursor:pointer;padding:9px 16px;"
+    + "border-radius:999px;border:1px solid var(--line,rgba(0,0,0,0.12));background:#fff;color:var(--ink,#111);}"
+    + ".ll-consent button.ll-consent__accept{background:var(--ink,#111);color:#fff;border-color:var(--ink,#111);}"
+    + "@media (prefers-reduced-motion:no-preference){.ll-consent{animation:llup .3s ease;}}"
+    + "@keyframes llup{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}";
+
+  function start() {
+    var st = document.createElement("style");
+    st.textContent = css;
+    document.head.appendChild(st);
+
+    var bar = document.createElement("div");
+    bar.className = "ll-consent";
+    bar.setAttribute("role", "dialog");
+    bar.setAttribute("aria-label", "Cookie consent");
+    bar.innerHTML =
+      '<p>We use cookies to measure traffic and improve the site.</p>' +
+      '<div class="ll-consent__actions">' +
+        '<button type="button" class="ll-consent__decline">Decline</button>' +
+        '<button type="button" class="ll-consent__accept">Accept</button>' +
+      '</div>';
+    document.body.appendChild(bar);
+
+    bar.querySelector(".ll-consent__accept").addEventListener("click", function () {
+      write("granted");
+      if (window.fbq) fbq("consent", "grant");
+      bar.parentNode && bar.parentNode.removeChild(bar);
+    });
+    bar.querySelector(".ll-consent__decline").addEventListener("click", function () {
+      write("denied");
+      if (window.fbq) fbq("consent", "revoke");
+      bar.parentNode && bar.parentNode.removeChild(bar);
+    });
+  }
+
+  if (document.body) start();
+  else document.addEventListener("DOMContentLoaded", start);
+})();

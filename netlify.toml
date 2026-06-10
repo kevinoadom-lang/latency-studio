@@ -1,0 +1,6 @@
+# Only declares the Functions directory so existing publish/build settings
+# (configured in the Netlify UI) are left untouched. Adds the CAPI endpoint
+# at /.netlify/functions/track.
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"

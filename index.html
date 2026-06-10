@@ -659,8 +659,10 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
+fbq('consent', 'revoke');                 /* withhold until the visitor consents */
 fbq('init', '427714368008362');
-fbq('track', 'PageView');
+fbq('track', 'PageView');                 /* queued; only sent once consent is granted */
+try { if (localStorage.getItem('ll_consent') === 'granted') fbq('consent', 'grant'); } catch (e) {}
 </script>
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
@@ -2119,14 +2121,40 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
           body: JSON.stringify(payload)
         }).then(function (res) {
           if (res.ok) {
-            if (window.fbq) {
-              fbq("track", "Lead", {
-                content_name: "Waitlist",
-                content_category: "waitlist",
-                model_interest: payload.model_interest,
-                use_case: payload.use_case,
-                stage: payload.stage
-              });
+            var eid = (window.crypto && crypto.randomUUID)
+              ? crypto.randomUUID()
+              : "lead-" + Date.now() + "-" + Math.random().toString(16).slice(2);
+            var leadData = {
+              content_name: "Waitlist",
+              content_category: "waitlist",
+              model_interest: payload.model_interest,
+              use_case: payload.use_case,
+              stage: payload.stage
+            };
+            // Browser pixel (eventID lets the server event de-duplicate against this one)
+            if (window.fbq) fbq("track", "Lead", leadData, { eventID: eid });
+            // Conversions API (server-side) — only with consent; no-ops if not deployed/configured
+            if (window.LL_consentGranted && window.LL_consentGranted()) {
+              try {
+                var getCookie = function (n) {
+                  var m = document.cookie.match("(?:^|; )" + n + "=([^;]*)");
+                  return m ? decodeURIComponent(m[1]) : undefined;
+                };
+                fetch("/.netlify/functions/track", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  keepalive: true,
+                  body: JSON.stringify({
+                    event_name: "Lead",
+                    event_id: eid,
+                    email: payload.email,
+                    event_source_url: location.href,
+                    fbp: getCookie("_fbp"),
+                    fbc: getCookie("_fbc"),
+                    custom_data: leadData
+                  })
+                }).catch(function () {});
+              } catch (e) {}
             }
             form.hidden = true;
             setStatus("You're on the list. We'll be in touch.", true);

@@ -261,8 +261,10 @@ n.queue=[];t=b.createElement(e);t.async=!0;
 t.src=v;s=b.getElementsByTagName(e)[0];
 s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
+fbq('consent', 'revoke');                 /* withhold until the visitor consents */
 fbq('init', '427714368008362');
-fbq('track', 'PageView');
+fbq('track', 'PageView');                 /* queued; only sent once consent is granted */
+try { if (localStorage.getItem('ll_consent') === 'granted') fbq('consent', 'grant'); } catch (e) {}
 </script>
 <noscript><img height="1" width="1" style="display:none"
 src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
