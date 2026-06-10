@@ -319,6 +319,8 @@
   }
   .card-fig:hover .card-overlay,
   .card-fig:focus-within .card-overlay { opacity: 1; }
+  /* Mobile: show overlay when details are explicitly shown */
+  .card-fig.showing-details .card-overlay { opacity: 1; }
   .ov-name { font-weight: 600; font-size: 15px; letter-spacing: 0.04em; color: var(--ink); }
   .ov-spec { margin: 0; display: grid; gap: 7px; }
   .ov-spec > div {
@@ -1708,6 +1710,37 @@
       </div>
     </div>
   </div>
+
+  <!-- Mobile tap-to-see-details handler -->
+  <script>
+    (function () {
+      "use strict";
+      var cards = document.querySelectorAll(".card-fig[data-char]");
+
+      cards.forEach(function (card) {
+        card.addEventListener("click", function (e) {
+          // If details are already showing, let the profile open
+          if (card.classList.contains("showing-details")) {
+            card.classList.remove("showing-details");
+            return;
+          }
+          // First tap: show details and prevent profile from opening
+          e.preventDefault();
+          e.stopPropagation();
+          card.classList.add("showing-details");
+        }, true); // capture phase to run before global handler
+      });
+
+      // Clear details when clicking outside a card
+      document.addEventListener("click", function (e) {
+        cards.forEach(function (card) {
+          if (!card.contains(e.target)) {
+            card.classList.remove("showing-details");
+          }
+        });
+      });
+    })();
+  </script>
 
   <script src="roster-shared.js"></script>
 </body>
