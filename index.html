@@ -2199,14 +2199,21 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
               use_case: payload.use_case,
               stage: payload.stage
             };
-            // Bump the capacity counter (server-side, accurate) — non-blocking.
+            // Bump the capacity counter (server-side). Fetch a fresh single-use
+            // nonce first, then POST it back so the increment can't be spoofed
+            // or replayed. Non-blocking; failures are ignored.
             try {
-              fetch("/.netlify/functions/waitlist", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                keepalive: true,
-                body: JSON.stringify({ _gotcha: "" })
-              }).catch(function () {});
+              fetch("/.netlify/functions/waitlist", { headers: { "Accept": "application/json" } })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (d) {
+                  fetch("/.netlify/functions/waitlist", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    keepalive: true,
+                    body: JSON.stringify({ _gotcha: "", nonce: (d && d.nonce) || "" })
+                  }).catch(function () {});
+                })
+                .catch(function () {});
             } catch (e) {}
             // Browser pixel (eventID lets the server event de-duplicate against this one)
             if (window.fbq) fbq("track", "Lead", leadData, { eventID: eid });
