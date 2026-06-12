@@ -165,19 +165,20 @@
   }
   /* Specs reveal only via the info button — keeps the image free for the
      outfit/headshot carousel so switching is never obstructed. */
-  .card-info:hover ~ .card-overlay,
-  .card-info:focus-visible ~ .card-overlay,
+  .card-info:hover:not(.is-open) ~ .card-overlay,
+  .card-info:focus-visible:not(.is-open) ~ .card-overlay,
   .ph.specs-open .card-overlay { opacity: 1; }
   /* "Details" chip — frosted pill, top-right of each card */
   .card-info {
-    position: absolute; top: 9px; right: 9px; z-index: 5;
-    padding: 5px 10px; border: 0; border-radius: 999px; cursor: pointer;
+    position: absolute; top: 8px; right: 8px; z-index: 5;
+    padding: 8px 14px; border: 0; border-radius: 999px; cursor: pointer;
     background: rgba(255,255,255,0.78); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
     box-shadow: 0 1px 3px rgba(0,0,0,0.12);
-    font-size: 9px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink);
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+    min-width: 48px; min-height: 36px; display: flex; align-items: center; justify-content: center;
   }
-  .card-info:hover, .card-info:focus-visible, .card-info.is-open { transform: scale(1.06); box-shadow: 0 2px 6px rgba(0,0,0,0.16); }
+  .card-info:hover, .card-info:focus-visible, .card-info.is-open { transform: scale(1.08); box-shadow: 0 2px 6px rgba(0,0,0,0.16); }
   .ov-name { font-weight: 600; font-size: 15px; letter-spacing: 0.04em; color: var(--ink); }
   .ov-spec { margin: 0; display: grid; gap: 7px; }
   .ov-spec > div { display: flex; justify-content: space-between; gap: 12px;
