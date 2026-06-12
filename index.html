@@ -181,6 +181,34 @@
   :root { --ink: #111; --muted: #777; --line: rgba(0,0,0,0.12); --annc-h: 44px; }
   body.annc-off { --annc-h: 0px; }
 
+  /* price spans never wrap mid-range (e.g. "$550–1,050") */
+  .price { white-space: nowrap; }
+
+  /* understated currency selector */
+  .currency-select {
+    font: inherit; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--muted); background: transparent;
+    border: 1px solid var(--line); border-radius: 6px;
+    padding: 4px 22px 4px 8px; cursor: pointer; line-height: 1;
+    -webkit-appearance: none; appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23777' stroke-width='1.2'/></svg>");
+    background-repeat: no-repeat; background-position: right 8px center;
+  }
+  .currency-select:hover, .currency-select:focus { color: var(--ink); border-color: var(--ink); outline: none; }
+
+  /* floating currency chip — fades in once scrolled past the hero */
+  .currency-fab {
+    position: fixed; top: 14px; right: 16px; z-index: 40;
+    background: rgba(255,255,255,0.85);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    border: 1px solid var(--line); border-radius: 999px; padding: 2px;
+    transform: translateY(-150%); opacity: 0;
+    transition: transform .3s ease, opacity .3s ease; pointer-events: none;
+  }
+  .currency-fab.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+  .currency-fab .currency-select { border: 0; }
+  @media (prefers-reduced-motion: reduce) { .currency-fab { transition: none; } }
+
   /* shared label/wordmark type — matches the hero character-name styling */
   .label {
     font-size: 11px; font-weight: 500; letter-spacing: 0.22em;
@@ -695,6 +723,15 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
     </button>
   </header>
 
+  <!-- ===== Floating currency selector ===== -->
+  <div class="currency-fab" id="currencyFab">
+    <select id="currency" class="currency-select" aria-label="Currency">
+      <option value="usd" selected>$ USD</option>
+      <option value="gbp">£ GBP</option>
+      <option value="eur">€ EUR</option>
+    </select>
+  </div>
+
   <!-- ===== Full-screen menu ===== -->
   <nav class="menu" id="menu" aria-hidden="true">
     <button class="close" id="menuClose" type="button" aria-label="Close menu">&times;</button>
@@ -1022,33 +1059,33 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
           <tbody>
             <tr>
               <td style="padding:10px 12px;border-bottom:1px solid var(--line);color:var(--muted);">Photographer</td>
-              <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);">£400–£800</td>
+              <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);"><span class="price" data-usd="$550–1,050" data-gbp="£400–800" data-eur="€500–950">$550–1,050</span></td>
               <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;">—</td>
             </tr>
             <tr>
               <td style="padding:10px 12px;border-bottom:1px solid var(--line);color:var(--muted);">Model</td>
-              <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);">£150–£500</td>
+              <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);"><span class="price" data-usd="$200–650" data-gbp="£150–500" data-eur="€200–600">$200–650</span></td>
               <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;">—</td>
             </tr>
             <tr>
               <td style="padding:10px 12px;border-bottom:1px solid var(--line);color:var(--muted);">Studio</td>
-              <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);">£300–£800</td>
+              <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);"><span class="price" data-usd="$400–1,050" data-gbp="£300–800" data-eur="€400–950">$400–1,050</span></td>
               <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;">—</td>
             </tr>
             <tr>
               <td style="padding:10px 12px;border-bottom:1px solid var(--line);color:var(--muted);">Styling</td>
-              <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);">£200–£500</td>
+              <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);"><span class="price" data-usd="$300–650" data-gbp="£200–500" data-eur="€250–600">$300–650</span></td>
               <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;">—</td>
             </tr>
             <tr>
               <td style="padding:10px 12px;border-bottom:1px solid var(--line);color:var(--muted);">Retouching</td>
-              <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);">£100–£300</td>
+              <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);"><span class="price" data-usd="$150–400" data-gbp="£100–300" data-eur="€150–400">$150–400</span></td>
               <td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;">—</td>
             </tr>
             <tr style="font-weight:600;">
               <td style="padding:12px 12px;border-bottom:1px solid var(--line);">Total</td>
-              <td style="padding:12px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);">£1,150–£2,900</td>
-              <td style="padding:12px 12px;border-bottom:1px solid var(--line);text-align:right;">From £600</td>
+              <td style="padding:12px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);"><span class="price" data-usd="$1,500–3,700" data-gbp="£1,150–2,900" data-eur="€1,350–3,400">$1,500–3,700</span></td>
+              <td style="padding:12px 12px;border-bottom:1px solid var(--line);text-align:right;"><span class="price" data-usd="From $800" data-gbp="From £600" data-eur="From €750">From $800</span></td>
             </tr>
             <tr>
               <td style="padding:10px 12px;border-bottom:1px solid var(--line);color:var(--muted);">Turnaround</td>
@@ -1191,26 +1228,6 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
         <a class="cta-pill" href="roster.html">View Full Roster →</a>
       </div>
 
-      <div class="tier-compare" style="margin:8px auto 0;max-width:760px;">
-        <table style="width:100%;border-collapse:collapse;font-size:14px;">
-          <thead>
-            <tr>
-              <th style="text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-weight:500;"></th>
-              <th style="text-align:right;padding:10px 12px;border-bottom:1px solid var(--line);font-weight:500;">Essential</th>
-              <th style="text-align:right;padding:10px 12px;border-bottom:1px solid var(--line);font-weight:500;">Signature</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td style="padding:10px 12px;border-bottom:1px solid var(--line);color:var(--muted);">Exclusivity</td><td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);">Shared roster</td><td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;">Locked to your brand</td></tr>
-            <tr><td style="padding:10px 12px;border-bottom:1px solid var(--line);color:var(--muted);">Commitment</td><td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);">One-off shoot</td><td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;">Seasonal / annual</td></tr>
-            <tr><td style="padding:10px 12px;border-bottom:1px solid var(--line);color:var(--muted);">Finals per shoot</td><td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);">12–15</td><td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;">12–15+</td></tr>
-            <tr><td style="padding:10px 12px;border-bottom:1px solid var(--line);color:var(--muted);">Delivery</td><td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);">48–72h</td><td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;">48–72h</td></tr>
-            <tr><td style="padding:10px 12px;border-bottom:1px solid var(--line);color:var(--muted);">Revisions</td><td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);">One round</td><td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;">Priority</td></tr>
-            <tr><td style="padding:10px 12px;border-bottom:1px solid var(--line);color:var(--muted);">Availability</td><td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;color:var(--muted);">Any brand</td><td style="padding:10px 12px;border-bottom:1px solid var(--line);text-align:right;">Yours alone</td></tr>
-            <tr style="font-weight:600;"><td style="padding:12px 12px;">From</td><td style="padding:12px 12px;text-align:right;color:var(--muted);">£600 / shoot</td><td style="padding:12px 12px;text-align:right;">£1,500 / season</td></tr>
-          </tbody>
-        </table>
-      </div>
     </div>
   </section>
 
@@ -1239,7 +1256,7 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
             <li>One revision round included</li>
             <li>Available to any brand</li>
           </ul>
-          <div class="pc-price">From £600 <span class="pc-per">per shoot</span></div>
+          <div class="pc-price">From <span class="price" data-usd="$800" data-gbp="£600" data-eur="€750">$800</span> <span class="pc-per">per shoot</span></div>
           <a class="pc-cta pc-cta--ghost" href="#book">Join the waitlist</a>
         </div>
       </div>
@@ -1263,8 +1280,8 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
             <li>Character consistency locked across all shoots</li>
             <li>Priority turnaround</li>
           </ul>
-          <div class="pc-price" id="sigPrice">From £1,500 <span class="pc-per">per season</span></div>
-          <div class="pc-save" id="sigSave" hidden>Save £1,500 vs seasonal</div>
+          <div class="pc-price" id="sigPrice">From <span class="price" id="sigAmt" data-usd="$1,950" data-gbp="£1,500" data-eur="€1,800">$1,950</span> <span class="pc-per" id="sigPer">per season</span></div>
+          <div class="pc-save" id="sigSave" hidden>Save <span class="price" data-usd="$1,950" data-gbp="£1,500" data-eur="€1,800">$1,950</span> vs seasonal</div>
           <a class="pc-cta pc-cta--solid" href="#book">Join the waitlist</a>
         </div>
       </div>
@@ -1784,22 +1801,60 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
     // ---- Signature pricing: Seasonal / Annual toggle ----
     (function () {
       const toggle = document.getElementById("sigToggle");
-      const price  = document.getElementById("sigPrice");
+      const amt    = document.getElementById("sigAmt");
+      const per    = document.getElementById("sigPer");
       const save   = document.getElementById("sigSave");
-      if (!toggle || !price) return;
+      const sel    = document.getElementById("currency");
+      if (!toggle || !amt) return;
       const PLANS = {
-        seasonal: { html: 'From £1,500 <span class="pc-per">per season</span>', save: false },
-        annual:   { html: 'From £4,500 <span class="pc-per">per year</span>',   save: true  },
+        seasonal: { usd: "$1,950", gbp: "£1,500", eur: "€1,800", per: "per season", save: false },
+        annual:   { usd: "$5,850", gbp: "£4,500", eur: "€5,400", per: "per year",   save: true  },
       };
       const buttons = toggle.querySelectorAll("button");
       function setPlan(plan) {
         const p = PLANS[plan];
         if (!p) return;
-        price.innerHTML = p.html;
-        save.hidden = !p.save;
+        amt.setAttribute("data-usd", p.usd);
+        amt.setAttribute("data-gbp", p.gbp);
+        amt.setAttribute("data-eur", p.eur);
+        if (per) per.textContent = p.per;
+        if (save) save.hidden = !p.save;
         buttons.forEach((b) => b.classList.toggle("active", b.getAttribute("data-plan") === plan));
+        if (sel) sel.dispatchEvent(new Event("change"));
       }
       buttons.forEach((b) => b.addEventListener("click", () => setPlan(b.getAttribute("data-plan"))));
+    })();
+
+    // ---- Manual currency selector ($ USD default; £ GBP / € EUR) ----
+    (function () {
+      var sel = document.getElementById("currency");
+      if (!sel) return;
+      function apply(cur) {
+        var spans = document.querySelectorAll(".price");
+        for (var i = 0; i < spans.length; i++) {
+          var v = spans[i].getAttribute("data-" + cur);
+          if (v != null) spans[i].textContent = v;
+        }
+      }
+      var stored = null;
+      try { stored = localStorage.getItem("currency"); } catch (e) {}
+      var cur = (stored === "gbp" || stored === "eur") ? stored : "usd";
+      sel.value = cur;
+      apply(cur);
+      sel.addEventListener("change", function () {
+        var c = sel.value;
+        try { localStorage.setItem("currency", c); } catch (e) {}
+        apply(c);
+      });
+      var fab = document.getElementById("currencyFab");
+      var heroEl = document.getElementById("hero");
+      if (fab && heroEl && "IntersectionObserver" in window) {
+        new IntersectionObserver(function (es) {
+          es.forEach(function (e) { fab.classList.toggle("show", !e.isIntersecting); });
+        }, { threshold: 0 }).observe(heroEl);
+      } else if (fab) {
+        fab.classList.add("show");
+      }
     })();
 
     // ---- Mobile pricing tabs (Essential / Signature / Bespoke) ----
