@@ -851,7 +851,15 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
         <p class="how-head">We deliver this</p>
         <div class="how-deliver__img how-swivel" id="howSwivel">
           <img id="howSwivelImg" src="processed/Hana%200%20Degree.png" alt="Hana styled in the complete look — drag to rotate" draggable="false" />
-          <span class="how-swivel__hint label">Drag to rotate</span>
+          <div class="how-swivel__hint" id="howSwivelHint" aria-hidden="true">
+            <svg class="how-swivel__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 8c3-1 5-1 8-1s5 0 8 1" stroke-width="1" vector-effect="non-scaling-stroke" />
+              <path d="M2 10l3-2 3 2" stroke-width="1" vector-effect="non-scaling-stroke" />
+              <path d="M20 16c-3 1-5 1-8 1s-5 0-8-1" stroke-width="1" vector-effect="non-scaling-stroke" />
+              <path d="M22 14l-3 2-3-2" stroke-width="1" vector-effect="non-scaling-stroke" />
+            </svg>
+            <span class="how-swivel__label">Drag to rotate</span>
+          </div>
         </div>
       </div>
 
@@ -956,9 +964,44 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
     .how-swivel { position: relative; cursor: grab; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
     .how-swivel.is-grabbing { cursor: grabbing; }
     .how-swivel img { pointer-events: none; -webkit-user-drag: none; }
+    .how-swivel {
+      position: relative;
+    }
     .how-swivel__hint {
-      position: absolute; left: 0; right: 0; bottom: 12px; text-align: center;
-      color: var(--muted); opacity: 0.85; pointer-events: none;
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(20, 20, 20, 0.4);
+      color: #fff;
+      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(6px);
+      pointer-events: none;
+      z-index: 2;
+      transition: opacity 0.4s ease;
+      opacity: 1;
+    }
+    .how-swivel__hint.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .how-swivel__icon {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+      color: currentColor;
+    }
+    .how-swivel__label {
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: inherit;
+      white-space: nowrap;
     }
 
     @media (max-width: 760px) {
@@ -1012,6 +1055,8 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
       FRAMES.forEach(function (src) { var p = new Image(); p.src = src; });
 
       var index = DEFAULT, startIndex = DEFAULT, startX = 0, dragging = false;
+      var hint = document.getElementById("howSwivelHint");
+      var hintFaded = false;
 
       function setIndex(i) {
         i = Math.max(0, Math.min(FRAMES.length - 1, i));   // clamp, no wrap
@@ -1026,6 +1071,10 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
         startX = e.clientX;
         startIndex = index;
         el.classList.add("is-grabbing");
+        if (hint && !hintFaded) {
+          hint.classList.add("fade-out");
+          hintFaded = true;
+        }
         if (el.setPointerCapture) { try { el.setPointerCapture(e.pointerId); } catch (err) {} }
       });
       el.addEventListener("pointermove", function (e) {
