@@ -420,6 +420,7 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
               info.classList.remove("is-open");
               info.setAttribute("aria-expanded", "false");
               info.textContent = "Details";
+              info.blur();  // Remove :focus-visible state
             }
           });
         });
@@ -433,6 +434,8 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
             info.classList.toggle("is-open", open);
             info.setAttribute("aria-expanded", open ? "true" : "false");
             info.textContent = open ? "Close" : "Details";
+            // Blur to remove :focus-visible state so it doesn't show overlay
+            info.blur();
           });
         }
 
