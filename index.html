@@ -553,6 +553,49 @@
   .form-status.is-ok { color: #1a7f37; }
   .form-status.is-err { color: #b3261e; }
 
+  /* Capacity meter — shows how full the intake is. No numbers, ever. */
+  .cap-meter { max-width: 560px; margin: 0 auto 40px; }
+  .cap-meter__status {
+    display: block; margin: 12px 0 0; text-align: center;
+    font-size: 12px; color: var(--muted); letter-spacing: 0.02em;
+    transition: color .5s ease;
+  }
+  .cap-meter.is-hot .cap-meter__status { color: var(--ink); font-weight: 500; }
+  .cap-meter__track {
+    position: relative; height: 6px; border-radius: 999px;
+    background: rgba(0,0,0,0.06); overflow: hidden;
+  }
+  .cap-meter__fill {
+    position: absolute; top: 0; bottom: 0; left: 0; width: 0;
+    border-radius: 999px; overflow: hidden;
+    background: linear-gradient(90deg, #8a8a8a 0%, #2b2b2b 100%);
+    transition: width 1.15s cubic-bezier(.22,1,.36,1);
+  }
+  /* Intensity overlay — deepens the bar toward solid ink as it fills past ~55%. */
+  .cap-meter__fill::after {
+    content: ""; position: absolute; inset: 0; border-radius: 999px;
+    background: var(--ink);
+    opacity: calc((var(--cap, 0) - 0.55) / 0.45);
+    transition: opacity .8s ease;
+  }
+  /* Shimmer sweep — only when near full. */
+  .cap-meter__fill::before {
+    content: ""; position: absolute; inset: 0; border-radius: 999px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent);
+    transform: translateX(-100%); opacity: 0; z-index: 1;
+  }
+  .cap-meter.is-hot .cap-meter__fill::before {
+    opacity: 1; animation: capShimmer 2.6s ease-in-out infinite;
+  }
+  @keyframes capShimmer {
+    0% { transform: translateX(-100%); }
+    55%, 100% { transform: translateX(240%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cap-meter__fill { transition: none; }
+    .cap-meter.is-hot .cap-meter__fill::before { animation: none; opacity: 0; }
+  }
+
   /* Waitlist chip groups */
   .chip-field { border: 0; margin: 0; padding: 0; min-width: 0; }
   .chip-legend { display: block; margin: 0 0 10px; padding: 0; font-size: 14px; color: var(--muted); }
@@ -1335,7 +1378,16 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
   <div class="wrap">
     <span class="eyebrow label">Book</span>
     <h2 style="text-align:center;font-size:clamp(1.8rem,5vw,3rem);font-weight:800;letter-spacing:-0.02em;margin:16px 0 12px;">Join the waitlist.</h2>
-    <p style="text-align:center;color:var(--muted);font-size:15px;margin:0 0 48px;">Tell us what you need and we'll be in touch when we open bookings.</p>
+    <p style="text-align:center;color:var(--muted);font-size:15px;margin:0 0 36px;">Tell us what you need and we'll be in touch when we open bookings.</p>
+
+    <!-- Capacity meter (no numbers — the bar fills and deepens as the intake closes) -->
+    <div class="cap-meter" id="capMeter" hidden>
+      <div class="cap-meter__track">
+        <span class="cap-meter__fill" id="capFill"></span>
+      </div>
+      <span class="cap-meter__status" id="capStatus"></span>
+    </div>
+
     <form class="form" id="bookForm" novalidate>
       <label>Email
         <input type="email" name="email" id="wlEmail" placeholder="you@brand.com" required />
@@ -2147,6 +2199,22 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
               use_case: payload.use_case,
               stage: payload.stage
             };
+            // Bump the capacity counter (server-side). Fetch a fresh single-use
+            // nonce first, then POST it back so the increment can't be spoofed
+            // or replayed. Non-blocking; failures are ignored.
+            try {
+              fetch("/.netlify/functions/waitlist", { headers: { "Accept": "application/json" } })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (d) {
+                  fetch("/.netlify/functions/waitlist", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    keepalive: true,
+                    body: JSON.stringify({ _gotcha: "", nonce: (d && d.nonce) || "" })
+                  }).catch(function () {});
+                })
+                .catch(function () {});
+            } catch (e) {}
             // Browser pixel (eventID lets the server event de-duplicate against this one)
             if (window.fbq) fbq("track", "Lead", leadData, { eventID: eid });
             // Conversions API (server-side) — only with consent; no-ops if not deployed/configured
@@ -2191,6 +2259,53 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
         wlStarted = true;
         if (window.fbq) fbq("trackCustom", "WaitlistStarted");
       });
+    })();
+  </script>
+
+  <!-- Capacity meter: fetch fill %, reveal on scroll, warm the gradient as it fills -->
+  <script>
+    (function () {
+      var meter = document.getElementById("capMeter");
+      if (!meter) return;
+      var fill = document.getElementById("capFill");
+      var statusEl = document.getElementById("capStatus");
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var pct = 0, revealed = false;
+
+      function statusFor(p) {
+        if (p >= 100) return "Intake closed";
+        if (p >= 85) return "Final spots";
+        if (p >= 60) return "Closing soon";
+        return "Filling steadily";
+      }
+      function apply() {
+        meter.style.setProperty("--cap", (pct / 100).toFixed(3));
+        statusEl.textContent = statusFor(pct);
+        meter.classList.toggle("is-hot", pct >= 85 && pct < 100);
+        if (revealed) fill.style.width = pct + "%";
+      }
+      function reveal() {
+        if (revealed) return;
+        revealed = true;
+        requestAnimationFrame(function () { fill.style.width = pct + "%"; });
+      }
+
+      fetch("/.netlify/functions/waitlist", { headers: { "Accept": "application/json" } })
+        .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+        .then(function (d) {
+          if (!d || typeof d.pct !== "number") throw 0;
+          pct = Math.max(0, Math.min(100, d.pct));
+          meter.hidden = false;
+          apply();
+          if (reduce || !("IntersectionObserver" in window)) { reveal(); return; }
+          var io = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+              if (e.isIntersecting) { reveal(); io.disconnect(); }
+            });
+          }, { threshold: 0.4 });
+          io.observe(meter);
+        })
+        .catch(function () { /* function not deployed/errored — leave the meter hidden */ });
     })();
   </script>
 
