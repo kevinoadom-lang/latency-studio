@@ -411,6 +411,15 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
           d.addEventListener("click", function (e) {
             e.stopPropagation();
             setIndex(parseInt(d.getAttribute("data-slide"), 10));
+            // Clicking carousel controls closes Details overlay (mutually exclusive)
+            var ph = car.parentNode;
+            ph.classList.remove("specs-open");
+            var info = ph.querySelector(".card-info");
+            if (info) {
+              info.classList.remove("is-open");
+              info.setAttribute("aria-expanded", "false");
+              info.textContent = "Details";
+            }
           });
         });
 
@@ -418,8 +427,11 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
         if (info) {
           info.addEventListener("click", function (e) {
             e.stopPropagation();
-            var open = car.parentNode.classList.toggle("specs-open");
+            var open = !car.parentNode.classList.contains("specs-open");
+            car.parentNode.classList.toggle("specs-open", open);
             info.classList.toggle("is-open", open);
+            info.setAttribute("aria-expanded", open ? "true" : "false");
+            info.textContent = open ? "Close" : "Details";
           });
         }
 
@@ -429,7 +441,7 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
 
     /* ===== Info affordance: "Details" chip ===== */
     function infoIcon(name) {
-      return '<button type="button" class="card-info" aria-label="View ' + name + ' details">Details</button>';
+      return '<button type="button" class="card-info" aria-label="View ' + name + ' details" aria-expanded="false">Details</button>';
     }
 
     /* ===== Build the grid ===== */

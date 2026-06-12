@@ -155,6 +155,16 @@
       if (profile.classList.contains("open") && profile.getAttribute("data-key") === key) return;
       if (!profile.classList.contains("open")) lastFocus = document.activeElement;
       if (!render(key)) return;
+      // Close all Details overlays in the grid when profile opens (mutually exclusive)
+      document.querySelectorAll(".card-info.is-open").forEach(function (btn) {
+        var ph = btn.closest(".ph");
+        if (ph) {
+          ph.classList.remove("specs-open");
+          btn.classList.remove("is-open");
+          btn.setAttribute("aria-expanded", "false");
+          btn.textContent = "Details";
+        }
+      });
       if (window.fbq) {
         fbq("track", "ViewContent", {
           content_type: "model",
