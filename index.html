@@ -36,8 +36,10 @@
     background: var(--bg);
     overflow: hidden;
     cursor: none;                 /* the lens ring IS the cursor */
-    touch-action: none;
     -webkit-tap-highlight-color: transparent;
+  }
+  .hero.lens-mode {
+    touch-action: none;            /* disable scroll only when lens mode is active */
   }
   .hero.touch { cursor: pointer; }
 
@@ -788,7 +790,7 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
       <div class="name" id="name" aria-hidden="true"></div>
     </div>
 
-    <div class="hint" id="hint" aria-hidden="true">Move to reveal · click to lock</div>
+    <div class="hint" id="hint" aria-hidden="true">Tap to activate lens mode</div>
 
     <button class="next-btn" id="nextBtn" type="button" aria-label="Lock in next character">›</button>
     <p class="sr-only" id="live" aria-live="polite"></p>
@@ -1653,9 +1655,11 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
       const live   = document.getElementById("live");
 
       const isTouch = window.matchMedia("(hover: none), (pointer: coarse)").matches;
+      let lensMode = false;        // Track if lens mode is active (touch devices only)
+
       if (isTouch) {
         hero.classList.add("touch");
-        hint.textContent = "Drag to reveal · tap to lock";
+        hint.textContent = "Tap to activate lens mode";
       }
 
       const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -1810,9 +1814,27 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
           commit();
         });
       } else {
-        // ---- Touch: drag to move the lens, tap to lock in ----
+        // ---- Touch: only activate lens on demand ----
         let startX = 0, startY = 0, moved = false;
+
+        // Toggle lens mode when hint is tapped
+        hint.addEventListener("click", (e) => {
+          e.stopPropagation();
+          lensMode = !lensMode;
+          hero.classList.toggle("lens-mode", lensMode);
+          if (lensMode) {
+            hint.textContent = "Tap again to exit";
+            // Show lens if user taps hint while in normal state
+            showLens(true);
+          } else {
+            hint.textContent = "Tap to activate lens mode";
+            showLens(false);
+          }
+        });
+
         hero.addEventListener("touchstart", (e) => {
+          // Only handle touch interactions in lens mode
+          if (!lensMode || e.target === nextBtn) return;
           const t = e.touches[0];
           startX = t.clientX; startY = t.clientY; moved = false;
           setTarget(t.clientX, t.clientY);
@@ -1820,11 +1842,13 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
           showLens(true); render();
         }, { passive: true });
         hero.addEventListener("touchmove", (e) => {
+          if (!lensMode) return;
           const t = e.touches[0];
           if (Math.hypot(t.clientX - startX, t.clientY - startY) > 8) moved = true;
           setTarget(t.clientX, t.clientY);
         }, { passive: true });
         hero.addEventListener("touchend", (e) => {
+          if (!lensMode) return;
           if (e.target !== nextBtn && !moved) commit();   // a tap locks in
           showLens(false);
         });
