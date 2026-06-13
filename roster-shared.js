@@ -246,6 +246,46 @@
 })();
 
 /* =========================================================================
+   Currency selector — persists across pages using localStorage.
+   Used on both index.html (with FAB) and roster.html.
+   ========================================================================= */
+(function () {
+  "use strict";
+  var sel = document.getElementById("currency");
+  if (!sel) return;
+
+  function apply(cur) {
+    var spans = document.querySelectorAll(".price");
+    for (var i = 0; i < spans.length; i++) {
+      var v = spans[i].getAttribute("data-" + cur);
+      if (v != null) spans[i].textContent = v;
+    }
+  }
+
+  var stored = null;
+  try { stored = localStorage.getItem("currency"); } catch (e) {}
+  var cur = (stored === "gbp" || stored === "eur") ? stored : "usd";
+  sel.value = cur;
+  apply(cur);
+
+  sel.addEventListener("change", function () {
+    var c = sel.value;
+    try { localStorage.setItem("currency", c); } catch (e) {}
+    apply(c);
+  });
+
+  var fab = document.getElementById("currencyFab");
+  var heroEl = document.getElementById("hero");
+  if (fab && heroEl && "IntersectionObserver" in window) {
+    new IntersectionObserver(function (es) {
+      es.forEach(function (e) { fab.classList.toggle("show", !e.isIntersecting); });
+    }, { threshold: 0 }).observe(heroEl);
+  } else if (fab) {
+    fab.classList.add("show");
+  }
+})();
+
+/* =========================================================================
    Cookie consent — gates the Meta Pixel (and CAPI). Loaded on every page.
    Default is "revoke" (set in the <head> snippet); the pixel only sends once
    the visitor accepts. Choice persisted in localStorage ("ll_consent").

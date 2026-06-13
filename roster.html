@@ -287,6 +287,39 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
     </button>
   </header>
 
+  <!-- ===== Currency selector ===== -->
+  <style>
+    .currency-select {
+      font: inherit; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); background: transparent;
+      border: 1px solid var(--line); border-radius: 6px;
+      padding: 4px 22px 4px 8px; cursor: pointer; line-height: 1;
+      -webkit-appearance: none; appearance: none;
+      background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' fill='none' stroke='%23777' stroke-width='1.2'/></svg>");
+      background-repeat: no-repeat; background-position: right 8px center;
+    }
+    .currency-select:hover, .currency-select:focus { color: var(--ink); border-color: var(--ink); outline: none; }
+
+    .currency-fab {
+      position: fixed; top: 14px; right: 16px; z-index: 40;
+      background: rgba(255,255,255,0.85);
+      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+      border: 1px solid var(--line); border-radius: 999px; padding: 2px;
+      transform: translateY(-150%); opacity: 0;
+      transition: transform .3s ease, opacity .3s ease; pointer-events: none;
+    }
+    .currency-fab.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+    .currency-fab .currency-select { border: 0; }
+    @media (prefers-reduced-motion: reduce) { .currency-fab { transition: none; } }
+  </style>
+  <div class="currency-fab" id="currencyFab">
+    <select id="currency" class="currency-select" aria-label="Currency">
+      <option value="usd" selected>$ USD</option>
+      <option value="gbp">£ GBP</option>
+      <option value="eur">€ EUR</option>
+    </select>
+  </div>
+
   <!-- ===== Full-screen menu ===== -->
   <nav class="menu" id="menu" aria-hidden="true">
     <button class="close" id="menuClose" type="button" aria-label="Close menu">&times;</button>
