@@ -1818,18 +1818,27 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
         let startX = 0, startY = 0, moved = false;
 
         // Toggle lens mode when hint is tapped
-        hint.addEventListener("click", (e) => {
-          e.stopPropagation();
+        function toggleLensMode() {
           lensMode = !lensMode;
           hero.classList.toggle("lens-mode", lensMode);
           if (lensMode) {
             hint.textContent = "Tap again to exit";
-            // Show lens if user taps hint while in normal state
             showLens(true);
           } else {
             hint.textContent = "Tap to activate lens mode";
             showLens(false);
           }
+        }
+
+        hint.addEventListener("click", (e) => {
+          e.stopPropagation();
+          toggleLensMode();
+        });
+
+        hint.addEventListener("touchend", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleLensMode();
         });
 
         hero.addEventListener("touchstart", (e) => {
