@@ -15,37 +15,43 @@
       name: "Akol", src: "processed/Akol.png", headshot: "processed/Akol%20Headshot.png", tier: "sig",
       specs: { Height: "5'11\"", Ethnicity: "South Sudanese", Hair: "Shaved", Eyes: "Dark brown", Build: "Tall lean angular" },
       tags: ["High fashion", "Editorial", "Campaign", "Avant-garde"],
-      priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
+      priceStock: { usd: "From $800 / drop", gbp: "From £600 / drop", eur: "From €750 / drop" },
+      priceSig: { usd: "From $1,950 / season", gbp: "From £1,500 / season", eur: "From €1,800 / season" }
     },
     eli: {
       name: "Eli", src: "processed/Eli.png", headshot: "processed/Eli%20Headshot.png", tier: "stock",
       specs: { Height: "6'0\"", Ethnicity: "Mixed heritage", Hair: "Short fade", Eyes: "Dark brown", Build: "Athletic natural" },
       tags: ["Streetwear", "Outerwear", "Accessories", "Menswear"],
-      priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
+      priceStock: { usd: "From $800 / drop", gbp: "From £600 / drop", eur: "From €750 / drop" },
+      priceSig: { usd: "From $1,950 / season", gbp: "From £1,500 / season", eur: "From €1,800 / season" }
     },
     hana: {
       name: "Hana", src: "processed/Hana.png", headshot: "processed/Hana%20Headshot.png", tier: "sig",
       specs: { Height: "5'6\"", Ethnicity: "East Asian", Hair: "Blunt bob", Eyes: "Dark brown", Build: "Slim precise" },
       tags: ["High fashion", "Editorial", "Contemporary", "Japanese brands"],
-      priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
+      priceStock: { usd: "From $800 / drop", gbp: "From £600 / drop", eur: "From €750 / drop" },
+      priceSig: { usd: "From $1,950 / season", gbp: "From £1,500 / season", eur: "From €1,800 / season" }
     },
     nadia: {
       name: "Nadia", src: "processed/Nadia.png", headshot: "processed/Nadia%20Headshot.png", tier: "sig",
       specs: { Height: "5'8\"", Ethnicity: "Italian/Algerian", Hair: "Dark brown", Eyes: "Dark brown", Build: "Tall lean" },
       tags: ["Elevated basics", "Outerwear", "Jewellery", "Lifestyle"],
-      priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
+      priceStock: { usd: "From $800 / drop", gbp: "From £600 / drop", eur: "From €750 / drop" },
+      priceSig: { usd: "From $1,950 / season", gbp: "From £1,500 / season", eur: "From €1,800 / season" }
     },
     ade: {
       name: "Ade", src: "processed/Ade.png", headshot: "processed/Ade%20Headshot.png", tier: "sig",
       specs: { Height: "6'1\"", Ethnicity: "Black American", Hair: "Thick mature locs", Eyes: "Dark brown", Build: "Lean athletic" },
       tags: ["High fashion", "Streetwear", "Editorial", "Campaign"],
-      priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
+      priceStock: { usd: "From $800 / drop", gbp: "From £600 / drop", eur: "From €750 / drop" },
+      priceSig: { usd: "From $1,950 / season", gbp: "From £1,500 / season", eur: "From €1,800 / season" }
     },
     caspar: {
       name: "Caspar", src: "processed/Caspar.png", headshot: "processed/Caspar%20Headshot.png", tier: "stock",
       specs: { Height: "6'2\"", Ethnicity: "Scandinavian", Hair: "Buzz cut dark brown", Eyes: "Blue-grey", Build: "Tall lean" },
       tags: ["Technical outerwear", "Contemporary menswear", "Scandinavian brands", "Lifestyle"],
-      priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
+      priceStock: { usd: "From $800 / drop", gbp: "From £600 / drop", eur: "From €750 / drop" },
+      priceSig: { usd: "From $1,950 / season", gbp: "From £1,500 / season", eur: "From €1,800 / season" }
     }
   };
   var ORDER = ["akol", "eli", "hana", "nadia", "ade", "caspar"];
@@ -136,9 +142,14 @@
       pfTier.className = "tier " + tierClass(c.tier);
       pfSpec.innerHTML = specRows(c.specs);
       pfTags.innerHTML = c.tags.map(function (t) { return '<span class="pf-tag">' + t + '</span>'; }).join("");
+      var cur = (function () {
+        try { return localStorage.getItem("currency") || "usd"; } catch (e) { return "usd"; }
+      })();
+      var stockPrice = typeof c.priceStock === 'string' ? c.priceStock : c.priceStock[cur];
+      var sigPrice = typeof c.priceSig === 'string' ? c.priceSig : c.priceSig[cur];
       pfPricing.innerHTML =
-        '<div class="pf-price-row"><span>Essential</span><span>' + c.priceStock + '</span></div>' +
-        '<div class="pf-price-row"><span>Signature</span><span>' + c.priceSig + '</span></div>';
+        '<div class="pf-price-row"><span>Essential</span><span>' + stockPrice + '</span></div>' +
+        '<div class="pf-price-row"><span>Signature</span><span>' + sigPrice + '</span></div>';
       if (c.tier === "sig") {
         pfAvail.className = "pf-avail is-booked";
         pfAvail.textContent = "Booked — 1 slot open";
@@ -272,7 +283,25 @@
     var c = sel.value;
     try { localStorage.setItem("currency", c); } catch (e) {}
     apply(c);
+    updateProfilePrices(c);
   });
+
+  function updateProfilePrices(cur) {
+    var profile = document.getElementById("profile");
+    if (!profile || !profile.classList.contains("open")) return;
+    var key = profile.getAttribute("data-key");
+    if (!key) return;
+    var c = CHARACTERS[key];
+    if (!c) return;
+    var pfPricing = document.getElementById("pfPricing");
+    if (!pfPricing) return;
+    var stockPrice = typeof c.priceStock === 'string' ? c.priceStock : c.priceStock[cur];
+    var sigPrice = typeof c.priceSig === 'string' ? c.priceSig : c.priceSig[cur];
+    pfPricing.innerHTML =
+      '<div class="pf-price-row"><span>Essential</span><span>' + stockPrice + '</span></div>' +
+      '<div class="pf-price-row"><span>Signature</span><span>' + sigPrice + '</span></div>';
+  }
+  window.LATENCY_updateProfilePrices = updateProfilePrices;
 
   var fab = document.getElementById("currencyFab");
   var heroEl = document.getElementById("hero");
