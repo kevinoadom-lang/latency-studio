@@ -1819,8 +1819,11 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
 
         // Toggle lens mode when hint is tapped
         function toggleLensMode() {
+          console.log("toggleLensMode called, lensMode was:", lensMode);
           lensMode = !lensMode;
           hero.classList.toggle("lens-mode", lensMode);
+          console.log("lensMode is now:", lensMode);
+          console.log("hero.classList:", hero.className);
           if (lensMode) {
             hint.textContent = "Tap again to exit";
             showLens(true);
@@ -1830,12 +1833,15 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
           }
         }
 
+        console.log("Setting up hint listeners, isTouch:", isTouch);
         hint.addEventListener("click", (e) => {
+          console.log("hint click event fired");
           e.stopPropagation();
           toggleLensMode();
         });
 
         hint.addEventListener("touchend", (e) => {
+          console.log("hint touchend event fired, target:", e.target, "hint:", hint);
           e.preventDefault();
           e.stopPropagation();
           toggleLensMode();
