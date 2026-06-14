@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6GE7BP5BF4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-6GE7BP5BF4');
+</script>
 <title>Eli — Latency</title>
 <style>
   :root {
@@ -2150,6 +2158,8 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
             };
             // Browser pixel (eventID lets the server event de-duplicate against this one)
             if (window.fbq) fbq("track", "Lead", leadData, { eventID: eid });
+            // GA4 conversion event (fires only on confirmed successful submit)
+            if (window.gtag) gtag('event', 'waitlist_signup', { method: 'website' });
             // Conversions API (server-side) — only with consent; no-ops if not deployed/configured
             if (window.LL_consentGranted && window.LL_consentGranted()) {
               try {
