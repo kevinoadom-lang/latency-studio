@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6GE7BP5BF4"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  // Consent Mode v2 — default denied; gates analytics/ads storage until the visitor accepts
+  gtag('consent', 'default', {
+    ad_storage: 'denied',
+    ad_user_data: 'denied',
+    ad_personalization: 'denied',
+    analytics_storage: 'denied'
+  });
+  // Honour a previously stored choice (same localStorage key the Meta Pixel uses)
+  try { if (localStorage.getItem('ll_consent') === 'granted') gtag('consent', 'update', { ad_storage: 'granted', ad_user_data: 'granted', ad_personalization: 'granted', analytics_storage: 'granted' }); } catch (e) {}
+  gtag('config', 'G-6GE7BP5BF4');
+</script>
+<title>Privacy Policy — Latency</title>
+<style>
+  * { box-sizing: border-box; }
+
+  :root { --ink: #111; --muted: #777; --line: rgba(0,0,0,0.12); --bg: #ffffff; --annc-h: 44px; }
+  body.annc-off { --annc-h: 0px; }
+
+  html { scroll-behavior: smooth; }
+  html, body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  body { overflow-x: hidden; }
+  body.menu-open { overflow: hidden; }
+
+  /* shared label/wordmark type */
+  .label {
+    font-size: 11px; font-weight: 500; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--ink);
+  }
+
+  /* Shared CTA pill (black, white text) */
+  .cta-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--ink); color: #fff; text-decoration: none;
+    font-size: 12px; letter-spacing: 0.08em; font-weight: 500;
+    padding: 8px 16px; border-radius: 999px; white-space: nowrap;
+    border: 0; cursor: pointer; font-family: inherit;
+    transition: opacity .2s ease;
+  }
+  .cta-pill:hover { opacity: 0.82; }
+
+  /* Announcement bar */
+  .announce {
+    display: flex; align-items: center; gap: 16px;
+    width: 100%; height: var(--annc-h); padding: 0 16px;
+    background: var(--bg); border-bottom: 1px solid var(--line);
+    font-size: 12px; letter-spacing: 0.08em; color: var(--muted);
+    overflow: hidden;
+  }
+  .announce__text { flex: 1 1 auto; min-width: 0; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis; }
+  .announce__cta { flex: 0 0 auto; }
+  .announce__close {
+    flex: 0 0 auto; width: 30px; height: 30px; margin-right: -6px;
+    border: 0; background: none; cursor: pointer; color: var(--muted);
+    font-size: 18px; line-height: 1; display: grid; place-items: center;
+    transition: color .2s ease;
+  }
+  .announce__close:hover { color: var(--ink); }
+  body.annc-off .announce { display: none; }
+
+  /* Nav */
+  .nav {
+    position: relative; width: 100%;
+    display: flex; align-items: center; justify-content: center;
+    height: 64px; padding: 0 20px; z-index: 50;
+    background: var(--bg); border-bottom: 1px solid var(--line);
+  }
+  .nav .wordmark { font-size: 15px; letter-spacing: 0.34em; color: var(--ink); text-decoration: none; }
+  .burger {
+    position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+    width: 42px; height: 42px; border: 0; background: none; cursor: pointer;
+    display: grid; place-items: center; color: var(--ink);
+  }
+  .burger span { display: block; width: 22px; height: 1.5px; background: var(--ink); margin: 3px 0; }
+
+  /* Full-screen menu */
+  .menu {
+    position: fixed; inset: 0; z-index: 60; background: var(--bg);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 26px; opacity: 0; visibility: hidden; transition: opacity .2s ease, visibility .2s ease;
+  }
+  .menu.open { opacity: 1; visibility: visible; }
+  .menu a {
+    font-size: clamp(30px, 8vw, 58px); font-weight: 800; letter-spacing: -0.01em;
+    color: var(--ink); text-decoration: none;
+  }
+  .menu .close {
+    position: absolute; top: 18px; right: 18px; width: 42px; height: 42px;
+    border: 0; background: none; font-size: 28px; line-height: 1; color: var(--ink); cursor: pointer;
+  }
+
+  /* Layout */
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  .eyebrow { display: block; text-align: center; color: var(--muted); }
+
+  /* ===== Legal / policy content ===== */
+  .legal { max-width: 720px; margin: 0 auto; padding: 84px 24px 120px; }
+  .legal-head { margin-bottom: 48px; }
+  .legal-head .eyebrow { text-align: left; }
+  .legal h1 {
+    font-size: clamp(30px, 6vw, 44px); font-weight: 700; letter-spacing: -0.02em;
+    line-height: 1.1; margin: 14px 0 0;
+  }
+  .legal .updated { margin-top: 16px; color: var(--muted); font-size: 13px; letter-spacing: 0.04em; }
+  .legal h2 {
+    font-size: 13px; font-weight: 600; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink); margin: 52px 0 14px;
+  }
+  .legal p, .legal li {
+    color: var(--muted); line-height: 1.7; font-size: 16px; margin: 0 0 16px;
+  }
+  .legal ul { margin: 0 0 16px; padding-left: 20px; }
+  .legal li { margin-bottom: 8px; }
+  .legal a { color: var(--ink); text-decoration: underline; text-underline-offset: 2px; }
+  .legal strong { color: var(--ink); font-weight: 600; }
+
+  /* Footer */
+  .footer { padding: 96px 0 72px; text-align: center; }
+  .footer .wordmark { font-size: 14px; letter-spacing: 0.34em; }
+  .footer .links { margin-top: 22px; display: flex; gap: 26px; justify-content: center; flex-wrap: wrap; }
+  .footer .links a { color: var(--ink); text-decoration: none; }
+</style>
+
+<!-- Meta Pixel Code -->
+<script>
+!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('consent', 'revoke');                 /* withhold until the visitor consents */
+fbq('init', '427714368008362');
+fbq('track', 'PageView');                 /* queued; only sent once consent is granted */
+try { if (localStorage.getItem('ll_consent') === 'granted') fbq('consent', 'grant'); } catch (e) {}
+</script>
+<noscript><img height="1" width="1" style="display:none"
+src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
+/></noscript>
+<!-- End Meta Pixel Code -->
+</head>
+<body>
+  <!-- ===== Announcement bar ===== -->
+  <div class="announce" id="announce" role="region" aria-label="Announcement">
+    <span class="announce__text">AI e-comm imagery for DTC brands — no studio, no day rate.</span>
+    <a class="cta-pill announce__cta" href="index.html#book">Book your first drop →</a>
+    <button class="announce__close" id="anncClose" type="button" aria-label="Dismiss announcement">&times;</button>
+  </div>
+
+  <!-- ===== Nav ===== -->
+  <header class="nav">
+    <a class="wordmark label" href="index.html">LATENCY</a>
+    <button class="burger" id="burger" type="button" aria-label="Open menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- ===== Full-screen menu ===== -->
+  <nav class="menu" id="menu" aria-hidden="true">
+    <button class="close" id="menuClose" type="button" aria-label="Close menu">&times;</button>
+    <a href="roster.html">Roster</a>
+    <a href="index.html#work">Work</a>
+    <a href="index.html#how">About</a>
+    <a href="index.html#book">Book</a>
+  </nav>
+
+  <!-- ===== Policy ===== -->
+  <main class="legal">
+    <div class="legal-head">
+      <span class="eyebrow label">Privacy Policy</span>
+      <h1>Your privacy</h1>
+      <p class="updated">Last updated: 14 June 2026</p>
+    </div>
+
+    <p>Latency ("we", "us") is an AI modelling and e-commerce imagery studio. This policy explains what we collect when you visit <strong>uselatency.com</strong> or get in touch, why we collect it, and the choices you have. We've kept it plain — no fine print.</p>
+
+    <h2>What we collect</h2>
+    <p>Two kinds of information:</p>
+    <ul>
+      <li><strong>What you give us.</strong> When you join the waitlist or send an enquiry, we collect your name, brand, the brief you describe, and your email address.</li>
+      <li><strong>What's collected automatically.</strong> When you browse the site, analytics tools may record pages viewed, approximate location (from your IP address), and basic device and browser details. This only happens if you've allowed it — see "Cookies and consent" below.</li>
+    </ul>
+
+    <h2>The tools we use</h2>
+    <p>We rely on a small number of trusted providers to run the site and understand how it's used:</p>
+    <ul>
+      <li><strong>Google Analytics 4</strong> — measures site traffic and which pages people visit.</li>
+      <li><strong>Meta Pixel</strong> — measures the performance of our ads on Facebook and Instagram.</li>
+      <li><strong>Meta Conversions API</strong> — when you submit the waitlist form, a copy of the event (including a securely hashed version of your email) is sent to Meta from our server to attribute the enquiry to an ad.</li>
+      <li><strong>Formspree</strong> — delivers your waitlist enquiry to our inbox.</li>
+      <li><strong>Netlify</strong> — hosts the website.</li>
+    </ul>
+
+    <h2>Cookies and consent</h2>
+    <p>Analytics and advertising cookies are <strong>switched off by default</strong>. Using Google Consent Mode, both Google Analytics and the Meta Pixel start in a "denied" state and only begin storing data if you opt in. Your choice is remembered in your browser (a value stored locally under the key <code>ll_consent</code>) so you aren't asked every visit.</p>
+    <p>You can withdraw consent at any time by clearing your browser's site data for uselatency.com, or by blocking cookies in your browser settings. You can also opt out directly through <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener">Google Analytics' opt-out</a> and your <a href="https://www.facebook.com/settings?tab=ads" target="_blank" rel="noopener">Meta ad preferences</a>.</p>
+
+    <h2>Why we collect it</h2>
+    <ul>
+      <li>To respond to your enquiry and discuss a possible booking.</li>
+      <li>To understand how the site is used and improve it.</li>
+      <li>To measure and improve our advertising.</li>
+    </ul>
+
+    <h2>Who we share it with</h2>
+    <p>We don't sell your information. We only share it with the providers named above, and only so they can perform their function for us. We may also disclose information if required by law.</p>
+
+    <h2>Your choices</h2>
+    <p>You can ask us what information we hold about you, ask us to correct or delete it, or opt out of analytics and advertising at any time. Just email us and we'll take care of it.</p>
+
+    <h2>Contact</h2>
+    <p>Questions, or want your data removed? Email <a href="mailto:hello@uselatency.com">hello@uselatency.com</a>.</p>
+
+    <h2>Changes to this policy</h2>
+    <p>If we update how we handle data, we'll revise this page and change the "Last updated" date above.</p>
+  </main>
+
+  <!-- ===== Footer ===== -->
+  <footer class="footer">
+    <div class="wordmark label">LATENCY</div>
+    <div class="links label">
+      <a href="roster.html">Roster</a>
+      <a href="index.html#work">Work</a>
+      <a href="index.html#how">About</a>
+      <a href="index.html#book">Book</a>
+      <a href="privacy-policy.html">Privacy Policy</a>
+    </div>
+  </footer>
+
+  <script>
+    /* ===== Announcement dismiss ===== */
+    (function () {
+      var anncClose = document.getElementById("anncClose");
+      if (sessionStorage.getItem("anncDismissed") === "1") document.body.classList.add("annc-off");
+      anncClose.addEventListener("click", function () {
+        document.body.classList.add("annc-off");
+        try { sessionStorage.setItem("anncDismissed", "1"); } catch (e) {}
+      });
+    })();
+
+    /* ===== Burger menu ===== */
+    (function () {
+      var burger = document.getElementById("burger");
+      var menu = document.getElementById("menu");
+      var close = document.getElementById("menuClose");
+      function setOpen(on) {
+        menu.classList.toggle("open", on);
+        document.body.classList.toggle("menu-open", on);
+        menu.setAttribute("aria-hidden", on ? "false" : "true");
+        burger.setAttribute("aria-expanded", on ? "true" : "false");
+      }
+      burger.addEventListener("click", function () { setOpen(!menu.classList.contains("open")); });
+      close.addEventListener("click", function () { setOpen(false); });
+      menu.querySelectorAll("a").forEach(function (a) { a.addEventListener("click", function () { setOpen(false); }); });
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape") setOpen(false); });
+    })();
+  </script>
+</body>
+</html>
