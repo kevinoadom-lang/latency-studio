@@ -296,11 +296,13 @@
     bar.querySelector(".ll-consent__accept").addEventListener("click", function () {
       write("granted");
       if (window.fbq) fbq("consent", "grant");
+      if (window.gtag) gtag("consent", "update", { ad_storage: "granted", ad_user_data: "granted", ad_personalization: "granted", analytics_storage: "granted" });
       bar.parentNode && bar.parentNode.removeChild(bar);
     });
     bar.querySelector(".ll-consent__decline").addEventListener("click", function () {
       write("denied");
       if (window.fbq) fbq("consent", "revoke");
+      if (window.gtag) gtag("consent", "update", { ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied", analytics_storage: "denied" });
       bar.parentNode && bar.parentNode.removeChild(bar);
     });
   }
