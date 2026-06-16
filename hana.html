@@ -2196,20 +2196,30 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
           use_case: selected(gUse),
           stage: stage,
           brand_link: document.getElementById("wlBrand").value.trim(),
-          _subject: "New Latency waitlist signup",
           _gotcha: ""
         };
+
+        // Apps Script web apps don't return readable CORS headers, so a JSON
+        // fetch can't read the response. POST form-encoded data with no-cors
+        // and treat a resolved request as success (fire-and-forget).
+        var body = new URLSearchParams();
+        body.append("email", payload.email);
+        body.append("name", payload.name);
+        body.append("model_interest", payload.model_interest);
+        (payload.use_case || []).forEach(function (v) { body.append("use_case", v); });
+        body.append("stage", payload.stage);
+        body.append("brand_link", payload.brand_link);
+        body.append("_gotcha", payload._gotcha);
 
         var label = btn.textContent;
         btn.disabled = true;
         btn.textContent = "Joining…";
 
-        fetch("https://formspree.io/f/mkoajogl", {
+        fetch("https://script.google.com/macros/s/AKfycby9VaB81wWsIt2cDfMpiHSIIDXW85rxX-UIosPHEScUSifPlQioJjscPyGzbSQxqhAP/exec", {
           method: "POST",
-          headers: { "Content-Type": "application/json", "Accept": "application/json" },
-          body: JSON.stringify(payload)
-        }).then(function (res) {
-          if (res.ok) {
+          mode: "no-cors",
+          body: body
+        }).then(function () {
             var eid = (window.crypto && crypto.randomUUID)
               ? crypto.randomUUID()
               : "lead-" + Date.now() + "-" + Math.random().toString(16).slice(2);
@@ -2249,10 +2259,6 @@ src="https://www.facebook.com/tr?id=427714368008362&ev=PageView&noscript=1"
             }
             form.hidden = true;
             setStatus("You're on the list. We'll be in touch.", true);
-          } else {
-            setStatus("Something went wrong — email kevin.oadom@gmail.com.", false);
-            btn.disabled = false; btn.textContent = label;
-          }
         }).catch(function () {
           setStatus("Something went wrong — email kevin.oadom@gmail.com.", false);
           btn.disabled = false; btn.textContent = label;
