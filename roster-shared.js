@@ -12,37 +12,37 @@
 
   var CHARACTERS = {
     akol: {
-      name: "Akol", src: "processed/Akol.png", headshot: "processed/Akol%20Headshot.png", tier: "sig",
+      name: "Akol", src: "processed/Akol.jpg", headshot: "processed/Akol%20Headshot.jpg", tier: "sig",
       specs: { Height: "5'11\"", Ethnicity: "South Sudanese", Hair: "Shaved", Eyes: "Dark brown", Build: "Tall lean angular" },
       tags: ["High fashion", "Editorial", "Campaign", "Avant-garde"],
       priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
     },
     eli: {
-      name: "Eli", src: "processed/Eli.png", headshot: "processed/Eli%20Headshot.png", tier: "stock",
+      name: "Eli", src: "processed/Eli.jpg", headshot: "processed/Eli%20Headshot.jpg", tier: "stock",
       specs: { Height: "6'0\"", Ethnicity: "Mixed heritage", Hair: "Short fade", Eyes: "Dark brown", Build: "Athletic natural" },
       tags: ["Streetwear", "Outerwear", "Accessories", "Menswear"],
       priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
     },
     hana: {
-      name: "Hana", src: "processed/Hana.png", headshot: "processed/Hana%20Headshot.png", tier: "sig",
+      name: "Hana", src: "processed/Hana.jpg", headshot: "processed/Hana%20Headshot.jpg", tier: "sig",
       specs: { Height: "5'6\"", Ethnicity: "East Asian", Hair: "Blunt bob", Eyes: "Dark brown", Build: "Slim precise" },
       tags: ["High fashion", "Editorial", "Contemporary", "Japanese brands"],
       priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
     },
     nadia: {
-      name: "Nadia", src: "processed/Nadia.png", headshot: "processed/Nadia%20Headshot.png", tier: "sig",
+      name: "Nadia", src: "processed/Nadia.jpg", headshot: "processed/Nadia%20Headshot.jpg", tier: "sig",
       specs: { Height: "5'8\"", Ethnicity: "Italian/Algerian", Hair: "Dark brown", Eyes: "Dark brown", Build: "Tall lean" },
       tags: ["Elevated basics", "Outerwear", "Jewellery", "Lifestyle"],
       priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
     },
     ade: {
-      name: "Ade", src: "processed/Ade.png", headshot: "processed/Ade%20Headshot.png", tier: "sig",
+      name: "Ade", src: "processed/Ade.jpg", headshot: "processed/Ade%20Headshot.jpg", tier: "sig",
       specs: { Height: "6'1\"", Ethnicity: "Black American", Hair: "Thick mature locs", Eyes: "Dark brown", Build: "Lean athletic" },
       tags: ["High fashion", "Streetwear", "Editorial", "Campaign"],
       priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
     },
     caspar: {
-      name: "Caspar", src: "processed/Caspar.png", headshot: "processed/Caspar%20Headshot.png", tier: "stock",
+      name: "Caspar", src: "processed/Caspar.jpg", headshot: "processed/Caspar%20Headshot.jpg", tier: "stock",
       specs: { Height: "6'2\"", Ethnicity: "Scandinavian", Hair: "Buzz cut dark brown", Eyes: "Blue-grey", Build: "Tall lean" },
       tags: ["Technical outerwear", "Contemporary menswear", "Scandinavian brands", "Lifestyle"],
       priceStock: "From £600 / drop", priceSig: "From £1,500 / season"
