@@ -1,0 +1,9 @@
+{
+  "name": "latency-site",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Latency (uselatency.com) — static site + Netlify functions.",
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}
