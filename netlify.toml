@@ -4,3 +4,19 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+
+# Cache static images at the browser/CDN so repeat and multi-page visits
+# don't re-download them. Filenames are stable, so a long max-age is safe;
+# no "immutable" since names aren't content-hashed (lets a re-upload revalidate).
+[[headers]]
+  for = "*.webp"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+[[headers]]
+  for = "*.jpg"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+[[headers]]
+  for = "*.png"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
