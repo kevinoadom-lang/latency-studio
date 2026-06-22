@@ -1,0 +1,49 @@
+# uselatency.com — paid-traffic landing site.
+# Goal: keep search + Meta ad-preview crawlers working, block the AI/SEO/data
+# scrapers that burn Netlify bandwidth for zero value. Note: aggressive bots
+# (e.g. Bytespider) ignore robots.txt — those are also blocked at the edge
+# via netlify/edge-functions/bot-filter.js.
+
+# --- Real users + ad/search crawlers: allowed by default (no rule needed) ---
+# Googlebot, Bingbot, facebookexternalhit (Meta ad link previews) are NOT blocked.
+
+# --- AI training / answer-engine crawlers ---
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-Web
+User-agent: anthropic-ai
+User-agent: CCBot
+User-agent: Google-Extended
+User-agent: meta-externalagent
+User-agent: meta-externalfetcher
+User-agent: PerplexityBot
+User-agent: Applebot-Extended
+User-agent: Bytespider
+User-agent: Amazonbot
+User-agent: Diffbot
+User-agent: Omgilibot
+User-agent: Timpibot
+User-agent: cohere-ai
+Disallow: /
+
+# --- SEO / backlink / data-mining crawlers ---
+User-agent: AhrefsBot
+User-agent: SemrushBot
+User-agent: MJ12bot
+User-agent: DotBot
+User-agent: DataForSeoBot
+User-agent: PetalBot
+User-agent: BLEXBot
+User-agent: rogerbot
+User-agent: dataprovider
+User-agent: serpstatbot
+Disallow: /
+
+# --- Everyone else: allow the site, but discourage crawling parameterized
+# (UTM / fbclid) URL variants, which multiply crawls of the same page. ---
+User-agent: *
+Disallow: /*?
+Allow: /$
+Allow: /

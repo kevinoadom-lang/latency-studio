@@ -5,6 +5,18 @@
   directory = "netlify/functions"
   node_bundler = "esbuild"
 
+# Edge bot-filter: 403s known AI/SEO/scraper bots before any HTML is served.
+# Runs only on page requests — static assets are excluded so we don't pay an
+# invocation per image (blocking the HTML already stops the crawl).
+[[edge_functions]]
+  path = "/*"
+  function = "bot-filter"
+  excludedPath = [
+    "/*.webp", "/*.jpg", "/*.jpeg", "/*.png", "/*.gif", "/*.svg", "/*.ico",
+    "/*.css", "/*.js", "/*.woff", "/*.woff2", "/*.txt", "/*.xml",
+    "/.netlify/*"
+  ]
+
 # Cache static images at the browser/CDN so repeat and multi-page visits
 # don't re-download them. Filenames are stable, so a long max-age is safe;
 # no "immutable" since names aren't content-hashed (lets a re-upload revalidate).
